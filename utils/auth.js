@@ -1,30 +1,23 @@
-const { API_BASE } = require("./config")
+const { CLOUD_ENV } = require("./config")
 
 const STORAGE_USER = "mp_user"
 const STORAGE_TOKEN = "mp_token"
 const STORAGE_PUBLIC_ID = "mp_public_id"
 
-function request({ url, method = "GET", data, needAuth = false }) {
-  const header = { "Content-Type": "application/json" }
-  if (needAuth) {
-    const token = wx.getStorageSync(STORAGE_TOKEN)
-    if (token) header.Authorization = `Bearer ${token}`
-  }
+function cloudReady() {
+  return !!(wx.cloud && CLOUD_ENV)
+}
+
+function callCloud(name, data = {}) {
   return new Promise((resolve, reject) => {
-    wx.request({
-      url,
-      method,
-      data,
-      header,
-      success: (res) => {
-        if (res.statusCode >= 200 && res.statusCode < 300) {
-          resolve(res.data)
-          return
-        }
-        reject(new Error(`HTTP ${res.statusCode}`))
-      },
-      fail: reject
-    })
+    if (!cloudReady()) {
+      reject(new Error("云开发未初始化"))
+      return
+    }
+    wx.cloud
+      .callFunction({ name, data })
+      .then((res) => resolve(res.result || {}))
+      .catch(reject)
   })
 }
 
@@ -67,53 +60,46 @@ function ensureLocalGuest() {
   return user
 }
 
-function wxLoginCode() {
-  return new Promise((resolve, reject) => {
-    wx.login({
-      success: (res) => (res.code ? resolve(res.code) : reject(new Error("no code"))),
-      fail: reject
-    })
-  })
-}
-
 function normalizeUser(raw) {
   if (!raw) return null
   return {
-    id: raw.id || raw.userId || "",
+    id: raw.id || raw.userId || raw._id || "",
     publicId: raw.publicId || raw.public_id || raw.displayId || 0,
-    nickname: raw.nickname || raw.nick_name || "游客",
+    nickname: raw.nickname || raw.nick_name || "用户",
+    avatarUrl: raw.avatarUrl || raw.avatar_url || "",
     email: raw.email || "",
     emailVerified: !!(raw.emailVerified || raw.email_verified),
-    isGuest: raw.isGuest !== false && raw.is_guest !== false,
+    isGuest: raw.isGuest === true || raw.is_guest === true,
     isLocal: false
   }
 }
 
-async function loginWithCode(code) {
-  const body = await request({
-    url: `${API_BASE}/api/mp/login`,
-    method: "POST",
-    data: { code }
-  })
+async function loginWithCloud() {
+  const body = await callCloud("login")
   if (body.code === 200 && body.data) {
     const { token, user } = body.data
     const normalized = normalizeUser(user)
     saveSession(token, normalized)
     return normalized
   }
-  throw new Error(body.msg || "login failed")
+  throw new Error(body.msg || "登录失败")
 }
 
 /**
- * 启动时静默登录：每次尝试后端 openid；失败则沿用/创建本地游客
+ * 启动时云函数静默登录（openid）；失败则本地游客
  */
 async function ensureLogin() {
-  try {
-    const code = await wxLoginCode()
-    return await loginWithCode(code)
-  } catch {
+  if (!cloudReady()) {
     const cached = getUser()
     if (cached) return cached
+    return ensureLocalGuest()
+  }
+  try {
+    return await loginWithCloud()
+  } catch {
+    const cached = getUser()
+    if (cached && !cached.isLocal) return cached
+    if (cached && cached.isLocal) return cached
     return ensureLocalGuest()
   }
 }
@@ -134,23 +120,13 @@ function isEmailBound(user) {
 }
 
 async function sendEmailCode(email) {
-  const body = await request({
-    url: `${API_BASE}/api/mp/auth/send-email-code`,
-    method: "POST",
-    data: { email },
-    needAuth: true
-  })
+  const body = await callCloud("sendEmailCode", { email })
   if (body.code === 200) return body
   throw new Error(body.msg || "发送失败")
 }
 
 async function bindEmail(email, code) {
-  const body = await request({
-    url: `${API_BASE}/api/mp/auth/bind-email`,
-    method: "POST",
-    data: { email, code },
-    needAuth: true
-  })
+  const body = await callCloud("bindEmail", { email, code })
   if (body.code === 200 && body.data) {
     const user = normalizeUser(body.data.user || body.data) || {
       ...getUser(),
@@ -181,5 +157,6 @@ module.exports = {
   bindEmail,
   refreshUserFromStorage,
   saveSession,
-  ensureLocalGuest
+  ensureLocalGuest,
+  callCloud
 }

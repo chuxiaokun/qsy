@@ -68,7 +68,7 @@ Page({
     if (user && user.isLocal) {
       wx.showModal({
         title: "暂无法发送验证码",
-        content: "用户服务接口尚未就绪。请先在后台配置 /api/mp/login 与邮箱验证码接口，或稍后再试。",
+        content: "请先完成云开发登录（部署 login 云函数并重新打开小程序），再绑定邮箱。",
         showCancel: false
       })
       return
@@ -103,7 +103,7 @@ Page({
     if (user && user.isLocal) {
       wx.showModal({
         title: "暂无法绑定",
-        content: "请先完成微信登录对接后台（code2Session），再绑定邮箱。",
+        content: "请先完成云开发登录（部署 login 云函数），邮箱绑定功能上线后再试。",
         showCancel: false
       })
       return

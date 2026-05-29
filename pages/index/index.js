@@ -186,19 +186,10 @@ Page({
       imageCurrent: 0,
       hasLivePhoto: false
     })
-    wx.request({
-      url: "https://qyapi.ipaybuy.cn/api/video",
-      method: "POST",
-      header: {
-        "Content-Type": "application/json"
-      },
-      data: {
-        appId: "116740",
-        appKey: "1a4f8drm5o0diutfrt90bd63m0a0c7lr",
-        url: this.data.linkInput
-      },
-      success: (res) => {
-        const body = res.data || {}
+    const link = this.data.linkInput.trim()
+    auth
+      .callCloud("parseVideo", { url: link })
+      .then((body) => {
         if (body.code === 200 && body.data) {
           wx.showToast({
             title: "解析成功",
@@ -218,7 +209,7 @@ Page({
           const hasLivePhoto = images.some((item) => item.livePhotoUrl)
 
           historyStore.addRecord({
-            sourceUrl: this.data.linkInput.trim(),
+            sourceUrl: link,
             title: parseResult.title,
             videoUrl: parseResult.videoUrl,
             images
@@ -237,17 +228,16 @@ Page({
           title: body.msg || "解析失败",
           icon: "none"
         })
-      },
-      fail: () => {
+      })
+      .catch((err) => {
         wx.showToast({
-          title: "网络请求失败",
+          title: (err && err.message) || "云函数调用失败，请确认已部署 parseVideo",
           icon: "none"
         })
-      },
-      complete: () => {
+      })
+      .finally(() => {
         this.setData({ isProcessing: false })
-      }
-    })
+      })
   },
 
   copyTitle() {

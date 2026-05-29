@@ -1,6 +1,6 @@
-/** 用户服务 API 根地址，需与后台 code2Session、邮箱验证码接口一致 */
-const API_BASE = "https://qyapi.ipaybuy.cn"
+/** 云开发环境 ID，与微信开发者工具 → 云开发控制台一致 */
+const CLOUD_ENV = "cloud1-d7grtvpeze9385cea"
 
 module.exports = {
-  API_BASE
+  CLOUD_ENV
 }
