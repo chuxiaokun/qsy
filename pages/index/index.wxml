@@ -1,0 +1,246 @@
+<view class="mini-app">
+  <view class="bg-decor">
+    <view class="decor decor-one"></view>
+    <view class="decor decor-two"></view>
+    <view class="decor decor-three"></view>
+  </view>
+
+  <view class="main page-fade">
+    <view wx:if="{{activeTab === 'remove'}}" class="section page-section">
+      <view class="hero center fade-down">
+        <view class="hero-icon gradient-bg shadow-glow float-slow">
+          <view class="icon icon-sparkles icon-white"></view>
+        </view>
+        <text class="title">去水印</text>
+        <text class="subtitle">一键去除图片和视频水印</text>
+      </view>
+
+      <view class="glass rounded-2xl mode-card shadow-soft fade-in">
+        <view class="mode-row">
+          <button class="mode-btn {{activeMode === 'link' ? 'mode-active' : ''}}" data-mode="link" bindtap="switchMode">
+            <view class="mode-bg" wx:if="{{activeMode === 'link'}}"></view>
+            <view class="icon icon-link mode-icon"></view>
+            <text class="mode-label">链接解析</text>
+          </button>
+          <button class="mode-btn {{activeMode === 'image' ? 'mode-active' : ''}}" data-mode="image" bindtap="switchMode">
+            <view class="mode-bg" wx:if="{{activeMode === 'image'}}"></view>
+            <view class="icon icon-image mode-icon"></view>
+            <text class="mode-label">图片</text>
+          </button>
+          <button class="mode-btn {{activeMode === 'video' ? 'mode-active' : ''}}" data-mode="video" bindtap="switchMode">
+            <view class="mode-bg" wx:if="{{activeMode === 'video'}}"></view>
+            <view class="icon icon-video mode-icon"></view>
+            <text class="mode-label">视频</text>
+          </button>
+        </view>
+      </view>
+
+      <view wx:if="{{activeMode === 'link'}}" class="content-slide">
+        <view class="glass rounded-2xl input-card shadow-soft">
+          <view class="input-row">
+            <view class="input-wrap">
+              <input class="link-input" value="{{linkInput}}" bindinput="onLinkInput" placeholder="粘贴视频/图片链接..." placeholder-class="placeholder" />
+              <button wx:if="{{linkInput}}" class="clear-btn" bindtap="clearLink">
+                <view class="icon icon-x"></view>
+              </button>
+            </view>
+            <button class="submit-btn gradient-bg shadow-soft {{(!linkInput || isProcessing) ? 'is-disabled' : ''}}" bindtap="handleProcess">
+              <view wx:if="{{isProcessing}}" class="spinner"></view>
+              <view wx:else class="icon icon-arrow-right icon-white"></view>
+            </button>
+          </view>
+        </view>
+
+        <view class="glass rounded-2xl platform-card shadow-soft">
+          <text class="card-label">支持的平台</text>
+          <view class="platform-grid">
+            <view class="platform-item" wx:for="{{platforms}}" wx:key="id">
+              <view class="platform-dot {{item.dotClass}}"></view>
+              <text class="platform-name">{{item.name}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <view wx:else class="content-slide">
+        <view class="glass rounded-2xl upload-card shadow-soft">
+          <view class="upload-inner">
+            <view class="upload-icon-box float-soft">
+              <view class="icon {{activeMode === 'image' ? 'icon-camera' : 'icon-file-video'}} icon-primary icon-large"></view>
+            </view>
+            <text class="upload-title">{{activeMode === 'image' ? '上传图片' : '上传视频'}}</text>
+            <text class="upload-desc">拖拽文件到这里，或点击选择</text>
+            <button class="choose-btn gradient-bg shadow-soft" bindtap="chooseFile">
+              <view class="icon icon-upload icon-white icon-small"></view>
+              <text>选择文件</text>
+            </button>
+          </view>
+        </view>
+
+        <view class="glass rounded-xl tip-card">
+          <view class="icon icon-check icon-primary icon-tip"></view>
+          <view class="tip-copy">
+            <text class="tip-title">智能识别水印</text>
+            <text class="tip-desc">支持 {{activeMode === 'image' ? 'JPG、PNG、WebP' : 'MP4、MOV、AVI'}} 格式，最大 {{activeMode === 'image' ? '20MB' : '200MB'}}</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="stats-row">
+        <view class="stat">
+          <text class="stat-value">128.5K</text>
+          <text class="stat-label">今日处理</text>
+        </view>
+        <view class="divider"></view>
+        <view class="stat">
+          <text class="stat-value">99.8%</text>
+          <text class="stat-label">成功率</text>
+        </view>
+        <view class="divider"></view>
+        <view class="stat">
+          <text class="stat-value">&lt;3s</text>
+          <text class="stat-label">平均耗时</text>
+        </view>
+      </view>
+    </view>
+
+    <view wx:elif="{{activeTab === 'products'}}" class="section page-section">
+      <view class="page-head fade-down">
+        <text class="page-title">更多产品</text>
+        <text class="page-desc">发现更多实用工具</text>
+      </view>
+
+      <view class="promo gradient-bg shadow-glow">
+        <view class="promo-orb"></view>
+        <view class="promo-content">
+          <view class="promo-kicker">
+            <view class="icon icon-zap icon-yellow icon-small"></view>
+            <text>限时特惠</text>
+          </view>
+          <text class="promo-title">会员尊享全部功能</text>
+          <text class="promo-desc">解锁所有高级工具，无限次使用</text>
+          <button class="promo-btn">
+            <text>立即开通</text>
+            <view class="icon icon-arrow-right icon-primary icon-small"></view>
+          </button>
+        </view>
+        <view class="icon icon-star promo-star"></view>
+      </view>
+
+      <view class="product-list">
+        <view class="glass rounded-2xl product-card shadow-soft" wx:for="{{products}}" wx:key="id">
+          <view class="product-icon-wrap {{item.bgClass}}">
+            <view class="product-icon-core {{item.colorClass}}">
+              <view class="icon {{item.iconClass}} icon-white icon-product"></view>
+            </view>
+          </view>
+          <view class="product-copy">
+            <view class="product-title-row">
+              <text class="product-title">{{item.name}}</text>
+              <text wx:if="{{item.badge}}" class="badge {{item.badgeClass}}">{{item.badge}}</text>
+            </view>
+            <text class="product-desc">{{item.description}}</text>
+          </view>
+          <view class="icon icon-arrow-right icon-muted product-arrow"></view>
+        </view>
+      </view>
+
+      <text class="bottom-note">更多工具持续上线中...</text>
+    </view>
+
+    <view wx:else class="section page-section profile-section">
+      <view class="glass rounded-3xl user-card shadow-soft fade-down">
+        <view class="user-row">
+          <view class="avatar-wrap">
+            <view class="avatar gradient-bg shadow-glow">U</view>
+            <view class="crown-badge pulse">
+              <view class="icon icon-crown icon-white icon-tiny"></view>
+            </view>
+          </view>
+          <view class="user-info">
+            <view class="name-row">
+              <text class="user-name">用户昵称</text>
+              <text class="vip-badge">VIP</text>
+            </view>
+            <text class="user-id">ID: 88888888</text>
+          </view>
+          <button class="edit-btn">
+            <view class="icon icon-settings icon-muted"></view>
+          </button>
+        </view>
+
+        <view class="member-card">
+          <view>
+            <view class="member-title-row">
+              <view class="icon icon-crown icon-amber icon-small"></view>
+              <text class="member-title">年度会员</text>
+            </view>
+            <text class="member-desc">有效期至 2025年12月31日</text>
+          </view>
+          <button class="renew-btn">续费</button>
+        </view>
+      </view>
+
+      <view class="glass rounded-2xl usage-card shadow-soft">
+        <view class="usage-item">
+          <text class="usage-value">1,286</text>
+          <text class="usage-label">处理次数</text>
+        </view>
+        <view class="usage-item">
+          <text class="usage-value">42h</text>
+          <text class="usage-label">节省时间</text>
+        </view>
+        <view class="usage-item">
+          <text class="usage-value">15天</text>
+          <text class="usage-label">连续使用</text>
+        </view>
+      </view>
+
+      <view class="glass rounded-2xl menu-card shadow-soft">
+        <view class="menu-item {{index !== menuItems.length - 1 ? 'has-border' : ''}}" wx:for="{{menuItems}}" wx:key="id">
+          <view class="menu-icon-box">
+            <view class="icon {{item.iconClass}} icon-primary icon-menu"></view>
+          </view>
+          <view class="menu-copy">
+            <text class="menu-title">{{item.name}}</text>
+            <text class="menu-desc">{{item.description}}</text>
+          </view>
+          <view class="menu-right">
+            <text wx:if="{{item.badge}}" class="badge {{item.badgeClass}}">{{item.badge}}</text>
+            <view class="icon icon-chevron-right icon-muted icon-small"></view>
+          </view>
+        </view>
+      </view>
+
+      <view class="glass rounded-2xl menu-card shadow-soft settings-card">
+        <view class="setting-item {{index !== settingsItems.length - 1 ? 'has-border' : ''}}" wx:for="{{settingsItems}}" wx:key="id">
+          <view class="icon {{item.iconClass}} icon-muted icon-setting"></view>
+          <text class="setting-title">{{item.name}}</text>
+          <view class="icon icon-chevron-right icon-muted icon-small"></view>
+        </view>
+      </view>
+
+      <text class="version">版本 1.0.0</text>
+    </view>
+  </view>
+
+  <view class="tabbar">
+    <view class="glass-strong rounded-2xl tabbar-inner shadow-soft">
+      <button class="tab-item {{activeTab === 'remove' ? 'tab-active' : ''}}" data-tab="remove" bindtap="switchTab">
+        <view wx:if="{{activeTab === 'remove'}}" class="tab-active-bg"></view>
+        <view class="icon icon-droplets tab-icon"></view>
+        <text class="tab-text">去水印</text>
+      </button>
+      <button class="tab-item {{activeTab === 'products' ? 'tab-active' : ''}}" data-tab="products" bindtap="switchTab">
+        <view wx:if="{{activeTab === 'products'}}" class="tab-active-bg"></view>
+        <view class="icon icon-grid tab-icon"></view>
+        <text class="tab-text">更多产品</text>
+      </button>
+      <button class="tab-item {{activeTab === 'profile' ? 'tab-active' : ''}}" data-tab="profile" bindtap="switchTab">
+        <view wx:if="{{activeTab === 'profile'}}" class="tab-active-bg"></view>
+        <view class="icon icon-user tab-icon"></view>
+        <text class="tab-text">个人中心</text>
+      </button>
+    </view>
+  </view>
+</view>

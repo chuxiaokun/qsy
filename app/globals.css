@@ -1,0 +1,178 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  /* 小清新薄荷绿主题 */
+  --background: oklch(0.98 0.01 160);
+  --foreground: oklch(0.25 0.02 250);
+  --card: oklch(1 0 0 / 0.7);
+  --card-foreground: oklch(0.25 0.02 250);
+  --popover: oklch(1 0 0 / 0.85);
+  --popover-foreground: oklch(0.25 0.02 250);
+  --primary: oklch(0.65 0.15 165);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.95 0.02 200);
+  --secondary-foreground: oklch(0.35 0.02 250);
+  --muted: oklch(0.96 0.01 200);
+  --muted-foreground: oklch(0.5 0.02 250);
+  --accent: oklch(0.85 0.1 200);
+  --accent-foreground: oklch(0.3 0.02 250);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(1 0 0);
+  --border: oklch(0.9 0.02 200 / 0.5);
+  --input: oklch(0.95 0.01 200);
+  --ring: oklch(0.65 0.15 165);
+  --radius: 1rem;
+  
+  /* 额外的主题色 */
+  --gradient-start: oklch(0.7 0.12 165);
+  --gradient-end: oklch(0.75 0.1 200);
+  --glass: oklch(1 0 0 / 0.6);
+  --glass-border: oklch(1 0 0 / 0.3);
+}
+
+.dark {
+  --background: oklch(0.15 0.02 250);
+  --foreground: oklch(0.95 0.01 200);
+  --card: oklch(0.2 0.02 250 / 0.7);
+  --card-foreground: oklch(0.95 0.01 200);
+  --popover: oklch(0.2 0.02 250 / 0.85);
+  --popover-foreground: oklch(0.95 0.01 200);
+  --primary: oklch(0.7 0.15 165);
+  --primary-foreground: oklch(0.15 0.02 250);
+  --secondary: oklch(0.25 0.02 250);
+  --secondary-foreground: oklch(0.9 0.01 200);
+  --muted: oklch(0.25 0.02 250);
+  --muted-foreground: oklch(0.65 0.02 200);
+  --accent: oklch(0.35 0.05 200);
+  --accent-foreground: oklch(0.95 0.01 200);
+  --destructive: oklch(0.5 0.2 27);
+  --destructive-foreground: oklch(0.95 0.01 200);
+  --border: oklch(0.3 0.02 250 / 0.5);
+  --input: oklch(0.25 0.02 250);
+  --ring: oklch(0.7 0.15 165);
+  
+  --gradient-start: oklch(0.5 0.12 165);
+  --gradient-end: oklch(0.55 0.1 200);
+  --glass: oklch(0.2 0.02 250 / 0.6);
+  --glass-border: oklch(0.3 0.02 250 / 0.3);
+}
+
+@theme inline {
+  --font-sans: 'Geist', 'Geist Fallback', system-ui, -apple-system, sans-serif;
+  --font-mono: 'Geist Mono', 'Geist Mono Fallback', monospace;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* 毛玻璃效果 */
+.glass {
+  background: var(--glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+}
+
+.glass-strong {
+  background: oklch(1 0 0 / 0.8);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border: 1px solid oklch(1 0 0 / 0.4);
+}
+
+/* 渐变背景 */
+.gradient-bg {
+  background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+}
+
+/* 柔和阴影 */
+.shadow-soft {
+  box-shadow: 0 4px 20px -2px oklch(0.5 0.05 200 / 0.15),
+              0 2px 8px -2px oklch(0.5 0.05 200 / 0.1);
+}
+
+.shadow-glow {
+  box-shadow: 0 0 30px oklch(0.65 0.15 165 / 0.3),
+              0 4px 20px -2px oklch(0.5 0.05 200 / 0.1);
+}
+
+/* 自定义滚动条 */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: oklch(0.7 0.1 165 / 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: oklch(0.7 0.1 165 / 0.5);
+}
+
+/* 动画关键帧 */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 2s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, transparent 0%, oklch(1 0 0 / 0.3) 50%, transparent 100%);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
