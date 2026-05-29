@@ -5,7 +5,7 @@
     <view class="decor decor-three"></view>
   </view>
 
-  <view class="main page-fade">
+  <view class="main page-fade" style="padding-top: {{statusBarHeight}}px;">
     <view wx:if="{{activeTab === 'remove'}}" class="section page-section">
       <view class="hero center fade-down">
         <view class="hero-icon gradient-bg shadow-glow float-slow">
@@ -37,7 +37,7 @@
 
       <view wx:if="{{activeMode === 'link'}}" class="content-slide">
         <view class="glass rounded-2xl input-card shadow-soft">
-          <view class="input-row">
+          <view wx:if="{{!showParseResult}}" class="input-col">
             <view class="input-wrap">
               <input class="link-input" value="{{linkInput}}" bindinput="onLinkInput" placeholder="粘贴视频/图片链接..." placeholder-class="placeholder" />
               <button wx:if="{{linkInput}}" class="clear-btn" bindtap="clearLink">
@@ -46,12 +46,56 @@
             </view>
             <button class="submit-btn gradient-bg shadow-soft {{(!linkInput || isProcessing) ? 'is-disabled' : ''}}" bindtap="handleProcess">
               <view wx:if="{{isProcessing}}" class="spinner"></view>
-              <view wx:else class="icon icon-arrow-right icon-white"></view>
+              <text wx:else class="submit-text">立即解析</text>
             </button>
+          </view>
+
+          <view wx:else class="result-col content-slide">
+            <view class="result-head">
+              <view class="result-status">
+                <view class="result-status-dot"></view>
+                <text class="result-status-text">解析完成</text>
+              </view>
+              <view class="result-reset" bindtap="continueParse">
+                <view class="icon icon-link result-reset-icon"></view>
+                <text class="result-reset-text">解析其他链接</text>
+              </view>
+            </view>
+
+            <video
+              wx:if="{{parseResult.videoUrl}}"
+              class="result-video"
+              src="{{parseResult.videoUrl}}"
+              controls
+              show-center-play-btn
+              object-fit="contain"
+            />
+
+            <view class="result-meta">
+              <text class="result-meta-label">视频标题</text>
+              <text class="result-title">{{parseResult.title}}</text>
+            </view>
+
+            <view class="result-actions">
+              <button class="result-btn gradient-bg shadow-soft {{isSavingVideo ? 'is-disabled' : ''}}" bindtap="saveVideo" disabled="{{isSavingVideo}}">
+                {{isSavingVideo ? '保存中...' : '保存到相册'}}
+              </button>
+              <button class="result-btn result-btn-outline" bindtap="copyTitle">复制标题</button>
+            </view>
+
+            <view wx:if="{{showDownloadProgress}}" class="download-progress">
+              <view class="download-progress-head">
+                <text class="download-progress-label">{{downloadPhase === 'saving' ? '正在写入相册' : '正在下载视频'}}</text>
+                <text class="download-progress-value">{{downloadProgress}}%</text>
+              </view>
+              <view class="download-progress-track">
+                <view class="download-progress-bar" style="width: {{downloadProgress}}%;"></view>
+              </view>
+            </view>
           </view>
         </view>
 
-        <view class="glass rounded-2xl platform-card shadow-soft">
+        <view wx:if="{{!showParseResult}}" class="glass rounded-2xl platform-card shadow-soft">
           <text class="card-label">支持的平台</text>
           <view class="platform-grid">
             <view class="platform-item" wx:for="{{platforms}}" wx:key="id">
@@ -152,7 +196,9 @@
       <view class="glass rounded-3xl user-card shadow-soft fade-down">
         <view class="user-row">
           <view class="avatar-wrap">
-            <view class="avatar gradient-bg shadow-glow">U</view>
+            <view class="avatar gradient-bg shadow-glow">
+              <text class="avatar-text">U</text>
+            </view>
             <view class="crown-badge pulse">
               <view class="icon icon-crown icon-white icon-tiny"></view>
             </view>
@@ -164,20 +210,20 @@
             </view>
             <text class="user-id">ID: 88888888</text>
           </view>
-          <button class="edit-btn">
+          <view class="edit-btn">
             <view class="icon icon-settings icon-muted"></view>
-          </button>
+          </view>
         </view>
 
         <view class="member-card">
-          <view>
+          <view class="member-info">
             <view class="member-title-row">
               <view class="icon icon-crown icon-amber icon-small"></view>
               <text class="member-title">年度会员</text>
             </view>
             <text class="member-desc">有效期至 2025年12月31日</text>
           </view>
-          <button class="renew-btn">续费</button>
+          <view class="renew-btn">续费</view>
         </view>
       </view>
 

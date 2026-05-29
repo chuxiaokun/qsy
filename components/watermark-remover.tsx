@@ -9,7 +9,6 @@ import {
   Upload, 
   Sparkles, 
   CheckCircle2,
-  ArrowRight,
   Camera,
   FileVideo,
   X
@@ -52,7 +51,7 @@ export default function WatermarkRemover() {
   }, [])
 
   return (
-    <div className="px-4 pt-12 pb-4">
+    <div className="px-4 pb-4">
       {/* 顶部标题 */}
       <motion.div 
         className="text-center mb-8"
@@ -122,8 +121,8 @@ export default function WatermarkRemover() {
           >
             {/* 链接输入框 */}
             <div className="glass rounded-2xl p-4 mb-4 shadow-soft">
-              <div className="flex items-center gap-3">
-                <div className="flex-1 relative">
+              <div className="flex flex-col gap-3">
+                <div className="relative">
                   <input
                     type="text"
                     value={linkInput}
@@ -143,7 +142,7 @@ export default function WatermarkRemover() {
                 <motion.button
                   onClick={handleProcess}
                   disabled={!linkInput.trim() || isProcessing}
-                  className="flex items-center justify-center w-12 h-12 rounded-xl gradient-bg text-white disabled:opacity-50 disabled:cursor-not-allowed shadow-soft"
+                  className="flex items-center justify-center w-full h-12 rounded-xl gradient-bg text-white text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed shadow-soft"
                   whileTap={{ scale: 0.95 }}
                   whileHover={{ scale: 1.02 }}
                 >
@@ -154,7 +153,7 @@ export default function WatermarkRemover() {
                       transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                     />
                   ) : (
-                    <ArrowRight className="w-5 h-5" />
+                    "立即解析"
                   )}
                 </motion.button>
               </div>

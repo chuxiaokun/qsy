@@ -79,14 +79,26 @@ const settingsItems = [
 
 Page({
   data: {
+    statusBarHeight: 0,
     activeTab: "remove",
     activeMode: "link",
     linkInput: "",
     isProcessing: false,
+    isSavingVideo: false,
+    showDownloadProgress: false,
+    downloadProgress: 0,
+    downloadPhase: "downloading",
+    showParseResult: false,
+    parseResult: null,
     platforms,
     products,
     menuItems,
     settingsItems
+  },
+
+  onLoad() {
+    const { statusBarHeight = 0 } = wx.getWindowInfo()
+    this.setData({ statusBarHeight })
   },
 
   switchTab(event) {
@@ -105,16 +117,171 @@ Page({
     this.setData({ linkInput: "" })
   },
 
+  continueParse() {
+    this.resetDownloadProgress()
+    this.setData({
+      linkInput: "",
+      showParseResult: false,
+      parseResult: null
+    })
+  },
+
+  resetDownloadProgress() {
+    this.setData({
+      isSavingVideo: false,
+      showDownloadProgress: false,
+      downloadProgress: 0,
+      downloadPhase: "downloading"
+    })
+  },
+
   handleProcess() {
     if (!this.data.linkInput.trim() || this.data.isProcessing) return
-    this.setData({ isProcessing: true })
-    setTimeout(() => {
-      this.setData({ isProcessing: false })
-      wx.showToast({
-        title: "解析完成",
-        icon: "success"
+    this.setData({
+      isProcessing: true,
+      showParseResult: false,
+      parseResult: null
+    })
+    wx.request({
+      url: "https://qyapi.ipaybuy.cn/api/video",
+      method: "POST",
+      header: {
+        "Content-Type": "application/json"
+      },
+      data: {
+        appId: "116740",
+        appKey: "1a4f8drm5o0diutfrt90bd63m0a0c7lr",
+        url: this.data.linkInput
+      },
+      success: (res) => {
+        const body = res.data || {}
+        if (body.code === 200 && body.data) {
+          wx.showToast({
+            title: "解析成功",
+            icon: "success"
+          })
+          this.setData({
+            showParseResult: true,
+            parseResult: {
+              videoUrl: body.data.video_url || "",
+              title: body.data.title || ""
+            }
+          })
+          return
+        }
+        wx.showToast({
+          title: body.msg || "解析失败",
+          icon: "none"
+        })
+      },
+      fail: () => {
+        wx.showToast({
+          title: "网络请求失败",
+          icon: "none"
+        })
+      },
+      complete: () => {
+        this.setData({ isProcessing: false })
+      }
+    })
+  },
+
+  copyTitle() {
+    const title = this.data.parseResult?.title
+    if (!title) return
+    wx.setClipboardData({
+      data: title,
+      success: () => {
+        wx.showToast({
+          title: "标题已复制",
+          icon: "success"
+        })
+      }
+    })
+  },
+
+  saveVideo() {
+    const videoUrl = this.data.parseResult?.videoUrl
+    if (!videoUrl || this.data.isSavingVideo) return
+
+    const doSave = () => {
+      this.setData({
+        isSavingVideo: true,
+        showDownloadProgress: true,
+        downloadProgress: 0,
+        downloadPhase: "downloading"
       })
-    }, 1600)
+      console.log('1111',videoUrl)
+      const downloadTask = wx.downloadFile({
+        
+        url: videoUrl,
+        success: (res) => {
+          console.log(res)
+          if (res.statusCode !== 200) {
+            wx.showToast({ title: "下载失败", icon: "none" })
+            this.resetDownloadProgress()
+            return
+          }
+          this.setData({
+            downloadProgress: 100,
+            downloadPhase: "saving"
+          })
+          wx.saveVideoToPhotosAlbum({
+            filePath: res.tempFilePath,
+            success: () => {
+              wx.showToast({
+                title: "已保存到相册",
+                icon: "success"
+              })
+              setTimeout(() => this.resetDownloadProgress(), 400)
+            },
+            fail: (err) => {
+              const denied = err.errMsg && err.errMsg.includes("auth deny")
+              wx.showToast({
+                title: denied ? "请授权相册权限" : "保存失败",
+                icon: "none"
+              })
+              this.resetDownloadProgress()
+            }
+          })
+        },
+        fail: () => {
+          wx.showToast({ title: "下载失败", icon: "none" })
+          this.resetDownloadProgress()
+        }
+      })
+
+      if (downloadTask && downloadTask.onProgressUpdate) {
+        downloadTask.onProgressUpdate(({ progress = 0 }) => {
+          this.setData({
+            downloadProgress: Math.min(Math.round(progress), 99)
+          })
+        })
+      }
+    }
+
+    wx.getSetting({
+      success: ({ authSetting }) => {
+        if (authSetting["scope.writePhotosAlbum"]) {
+          doSave()
+          return
+        }
+        wx.authorize({
+          scope: "scope.writePhotosAlbum",
+          success: doSave,
+          fail: () => {
+            wx.showModal({
+              title: "需要相册权限",
+              content: "请在设置中开启保存到相册权限",
+              confirmText: "去设置",
+              success: (modalRes) => {
+                if (modalRes.confirm) wx.openSetting()
+              }
+            })
+          }
+        })
+      }
+    })
   },
 
   chooseFile() {

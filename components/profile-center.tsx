@@ -90,7 +90,7 @@ const item = {
 
 export default function ProfileCenter() {
   return (
-    <div className="px-4 pt-12 pb-4">
+    <div className="px-4 pb-4">
       {/* 用户信息卡片 */}
       <motion.div
         className="glass rounded-3xl p-5 mb-6 shadow-soft"
@@ -101,14 +101,14 @@ export default function ProfileCenter() {
         <div className="flex items-center gap-4">
           {/* 头像 */}
           <motion.div 
-            className="relative"
+            className="relative shrink-0"
             whileHover={{ scale: 1.05 }}
           >
             <div className="w-16 h-16 rounded-2xl gradient-bg flex items-center justify-center text-white text-xl font-bold shadow-glow">
               U
             </div>
             <motion.div 
-              className="absolute -bottom-1 -right-1 w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center border-2 border-white"
+              className="absolute -bottom-0.5 -right-0.5 w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center border-2 border-white z-10"
               animate={{ scale: [1, 1.1, 1] }}
               transition={{ duration: 2, repeat: Infinity }}
             >
@@ -117,19 +117,19 @@ export default function ProfileCenter() {
           </motion.div>
           
           {/* 用户信息 */}
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-1">
-              <h2 className="text-lg font-bold text-foreground">用户昵称</h2>
-              <span className="px-2 py-0.5 bg-gradient-to-r from-amber-400 to-yellow-400 text-white text-[10px] font-medium rounded-full">
+          <div className="flex-1 min-w-0 overflow-hidden">
+            <div className="flex items-center gap-2 mb-1 min-w-0">
+              <h2 className="text-lg font-bold text-foreground truncate">用户昵称</h2>
+              <span className="shrink-0 px-2 py-0.5 bg-gradient-to-r from-amber-400 to-yellow-400 text-white text-[10px] font-medium rounded-full leading-none">
                 VIP
               </span>
             </div>
-            <p className="text-sm text-muted-foreground">ID: 88888888</p>
+            <p className="text-sm text-muted-foreground truncate">ID: 88888888</p>
           </div>
           
           {/* 编辑按钮 */}
           <motion.button
-            className="p-2 rounded-xl bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors"
+            className="shrink-0 p-2 rounded-xl bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
@@ -142,16 +142,16 @@ export default function ProfileCenter() {
           className="mt-4 p-4 rounded-2xl bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-900/20 dark:to-yellow-900/20 border border-amber-200/50 dark:border-amber-700/30"
           whileHover={{ scale: 1.01 }}
         >
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="flex items-center gap-2 mb-1">
-                <Crown className="w-4 h-4 text-amber-500" />
-                <span className="text-sm font-semibold text-amber-700 dark:text-amber-400">年度会员</span>
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex-1 min-w-0 overflow-hidden">
+              <div className="flex items-center gap-2 mb-1 min-w-0">
+                <Crown className="w-4 h-4 text-amber-500 shrink-0" />
+                <span className="text-sm font-semibold text-amber-700 dark:text-amber-400 truncate">年度会员</span>
               </div>
-              <p className="text-xs text-amber-600/70 dark:text-amber-400/70">有效期至 2025年12月31日</p>
+              <p className="text-xs text-amber-600/70 dark:text-amber-400/70 truncate">有效期至 2025年12月31日</p>
             </div>
             <motion.button
-              className="px-4 py-2 bg-gradient-to-r from-amber-400 to-yellow-400 text-white text-sm font-medium rounded-xl shadow-sm"
+              className="shrink-0 px-4 py-2 bg-gradient-to-r from-amber-400 to-yellow-400 text-white text-sm font-medium rounded-xl shadow-sm whitespace-nowrap"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >

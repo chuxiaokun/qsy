@@ -26,7 +26,7 @@ export default function MiniApp() {
       </div>
 
       {/* 主内容区域 */}
-      <main className="relative z-10 pb-24 min-h-screen">
+      <main className="relative z-10 min-h-screen pt-[calc(env(safe-area-inset-top)+3rem)] pb-[calc(7rem+env(safe-area-inset-bottom))]">
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
@@ -44,7 +44,7 @@ export default function MiniApp() {
       </main>
 
       {/* 底部 Tab 栏 */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50">
+      <nav className="fixed bottom-0 left-0 right-0 z-50 pb-[env(safe-area-inset-bottom)]">
         <div className="mx-4 mb-4">
           <div className="glass-strong rounded-2xl shadow-soft px-2 py-2">
             <div className="flex items-center justify-around">

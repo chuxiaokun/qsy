@@ -85,7 +85,7 @@ const item = {
 
 export default function MoreProducts() {
   return (
-    <div className="px-4 pt-12 pb-4">
+    <div className="px-4 pb-4">
       {/* 顶部标题 */}
       <motion.div 
         className="mb-6"
