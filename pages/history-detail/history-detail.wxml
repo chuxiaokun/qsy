@@ -1,0 +1,66 @@
+<view class="subpage">
+  <view class="sub-bg"></view>
+  <view class="sub-main" style="padding-top: {{statusBarHeight}}px;">
+    <view class="sub-nav">
+      <view class="sub-nav-back" bindtap="goBack">
+        <view class="icon icon-back"></view>
+      </view>
+      <text class="sub-nav-title">记录详情</text>
+    </view>
+
+    <view wx:if="{{record}}" class="detail-body">
+      <view class="glass rounded-2xl shadow-soft card-block">
+        <video
+          wx:if="{{record.videoUrl}}"
+          class="detail-video"
+          src="{{record.videoUrl}}"
+          controls
+          show-center-play-btn
+          object-fit="contain"
+        />
+
+        <view wx:elif="{{record.images.length}}" class="detail-gallery">
+          <swiper
+            current="{{imageCurrent}}"
+            bindchange="onSwiperChange"
+            circular="{{record.images.length > 1}}"
+            indicator-dots="{{record.images.length > 1}}"
+            indicator-color="rgba(255,255,255,0.4)"
+            indicator-active-color="#35bd94"
+          >
+            <swiper-item wx:for="{{record.images}}" wx:key="url">
+              <image class="detail-image" src="{{item.url}}" mode="aspectFit" bindtap="previewImages" />
+            </swiper-item>
+          </swiper>
+        </view>
+
+        <view class="detail-meta">
+          <text class="detail-label">{{record.videoUrl ? '视频标题' : '作品标题'}}</text>
+          <text class="detail-title">{{record.title || '未命名作品'}}</text>
+          <text class="detail-time">{{timeLabel}}</text>
+        </view>
+      </view>
+
+      <view class="action-col">
+        <button class="primary-btn gradient-bg shadow-soft {{isSaving ? 'is-disabled' : ''}}" bindtap="saveMedia" disabled="{{isSaving}}">
+          {{isSaving ? '保存中...' : '再次保存到相册'}}
+        </button>
+        <button wx:if="{{hasLive}}" class="outline-btn {{isSavingLive ? 'is-disabled' : ''}}" bindtap="saveLive" disabled="{{isSavingLive}}">
+          {{isSavingLive ? '保存中...' : '保存 Live Photo'}}
+        </button>
+        <button class="outline-btn" bindtap="copyTitle">复制标题</button>
+        <button class="outline-btn danger-btn" bindtap="deleteRecord">删除记录</button>
+      </view>
+
+      <view wx:if="{{showProgress}}" class="glass rounded-2xl shadow-soft card-block progress-wrap">
+        <view class="progress-head">
+          <text>{{progressLabel}}</text>
+          <text>{{progress}}%</text>
+        </view>
+        <view class="progress-track">
+          <view class="progress-bar" style="width: {{progress}}%;"></view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

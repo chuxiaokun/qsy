@@ -1,0 +1,60 @@
+@import "../../styles/subpage.wxss";
+
+.mode-tabs {
+  display: flex;
+  padding: 8rpx;
+  margin-bottom: 24rpx;
+}
+
+.mode-tab {
+  flex: 1;
+  height: 80rpx;
+  color: #76827f;
+  font-size: 28rpx;
+  font-weight: 500;
+  border-radius: 20rpx;
+}
+
+.mode-tab-active {
+  color: #fff;
+  background: linear-gradient(135deg, #58cfa3 0%, #83d6e5 100%);
+  box-shadow: 0 8rpx 24rpx rgba(64, 199, 159, 0.2);
+}
+
+.convert-title {
+  display: block;
+  margin-bottom: 12rpx;
+  color: #2f3b39;
+  font-size: 32rpx;
+  font-weight: 600;
+}
+
+.convert-desc {
+  display: block;
+  margin-bottom: 28rpx;
+  color: #76827f;
+  font-size: 26rpx;
+  line-height: 1.6;
+}
+
+.preview-wrap {
+  margin-bottom: 24rpx;
+  padding: 16rpx;
+  background: rgba(235, 246, 247, 0.8);
+  border-radius: 20rpx;
+}
+
+.preview-image {
+  width: 100%;
+  height: 360rpx;
+}
+
+.hidden-canvas {
+  position: fixed;
+  left: -9999px;
+  top: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}

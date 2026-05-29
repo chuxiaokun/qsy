@@ -1,0 +1,65 @@
+<view class="subpage">
+  <view class="sub-bg"></view>
+  <view class="sub-main" style="padding-top: {{statusBarHeight}}px;">
+    <view class="sub-nav">
+      <view class="sub-nav-back" bindtap="goBack">
+        <view class="icon icon-back"></view>
+      </view>
+      <text class="sub-nav-title">绑定邮箱</text>
+    </view>
+
+    <view class="glass rounded-2xl shadow-soft form-card">
+      <text class="form-tip">绑定后可用于找回账号、接收通知。验证码将发送至您的邮箱。</text>
+
+      <view class="field">
+        <text class="field-label">邮箱</text>
+        <input
+          class="field-input"
+          type="text"
+          value="{{email}}"
+          bindinput="onEmailInput"
+          placeholder="请输入邮箱地址"
+          placeholder-class="field-placeholder"
+          disabled="{{!!boundEmail}}"
+        />
+      </view>
+
+      <view wx:if="{{!boundEmail}}" class="field">
+        <text class="field-label">验证码</text>
+        <view class="code-row">
+          <input
+            class="field-input code-input"
+            type="number"
+            maxlength="6"
+            value="{{code}}"
+            bindinput="onCodeInput"
+            placeholder="6 位验证码"
+            placeholder-class="field-placeholder"
+          />
+          <button
+            class="code-btn {{countdown > 0 || sendingCode ? 'is-disabled' : ''}}"
+            bindtap="sendCode"
+            disabled="{{countdown > 0 || sendingCode}}"
+          >
+            {{countdown > 0 ? countdown + 's' : '获取验证码'}}
+          </button>
+        </view>
+      </view>
+
+      <button
+        wx:if="{{!boundEmail}}"
+        class="primary-btn gradient-bg shadow-soft submit-btn {{submitting ? 'is-disabled' : ''}}"
+        bindtap="submitBind"
+        disabled="{{submitting}}"
+      >
+        {{submitting ? '提交中...' : '确认绑定'}}
+      </button>
+
+      <view wx:else class="bound-box">
+        <view class="icon icon-check icon-primary bound-icon"></view>
+        <text class="bound-email">{{boundEmail}}</text>
+        <text class="bound-hint">已绑定，如需更换请联系客服</text>
+      </view>
+    </view>
+  </view>
+</view>

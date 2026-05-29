@@ -1,0 +1,55 @@
+@import "../../styles/subpage.wxss";
+
+.detail-body {
+  display: flex;
+  flex-direction: column;
+}
+
+.detail-video,
+.detail-image {
+  width: 100%;
+  height: 420rpx;
+  border-radius: 20rpx;
+  background: #eef6f5;
+}
+
+.detail-gallery {
+  margin-bottom: 20rpx;
+}
+
+.detail-meta {
+  margin-top: 20rpx;
+}
+
+.detail-label {
+  display: block;
+  margin-bottom: 8rpx;
+  color: #76827f;
+  font-size: 24rpx;
+}
+
+.detail-title {
+  display: block;
+  color: #2f3b39;
+  font-size: 30rpx;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.detail-time {
+  display: block;
+  margin-top: 12rpx;
+  color: #9aa5a2;
+  font-size: 24rpx;
+}
+
+.action-col {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.danger-btn {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.08);
+}

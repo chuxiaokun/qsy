@@ -1,0 +1,52 @@
+<view class="subpage">
+  <view class="sub-bg"></view>
+  <view class="sub-main" style="padding-top: {{statusBarHeight}}px;">
+    <view class="sub-nav">
+      <view class="sub-nav-back" bindtap="goBack">
+        <view class="icon icon-back"></view>
+      </view>
+      <text class="sub-nav-title">格式转换</text>
+    </view>
+
+    <view class="mode-tabs glass rounded-2xl shadow-soft">
+      <button class="mode-tab {{mode === 'heic' ? 'mode-tab-active' : ''}}" data-mode="heic" bindtap="switchMode">HEIC → JPG</button>
+      <button class="mode-tab {{mode === 'gif' ? 'mode-tab-active' : ''}}" data-mode="gif" bindtap="switchMode">视频 → GIF</button>
+    </view>
+
+    <view class="glass rounded-2xl shadow-soft card-block convert-card">
+      <view wx:if="{{mode === 'heic'}}">
+        <text class="convert-title">图片格式转换</text>
+        <text class="convert-desc">从相册选择 HEIC 或其他图片，导出为 JPG 并保存到相册</text>
+        <view wx:if="{{previewPath}}" class="preview-wrap">
+          <image class="preview-image" src="{{previewPath}}" mode="aspectFit" />
+        </view>
+        <button class="primary-btn gradient-bg shadow-soft {{isConverting ? 'is-disabled' : ''}}" bindtap="chooseHeic" disabled="{{isConverting}}">
+          {{previewPath ? (isConverting ? '转换中...' : '重新选择并转换') : '选择图片并转换'}}
+        </button>
+      </view>
+
+      <view wx:else>
+        <text class="convert-title">视频转 GIF</text>
+        <text class="convert-desc">截取视频前 3 秒（最多 12 帧），生成 GIF 并保存到相册。建议时长不超过 10 秒的视频。</text>
+        <view wx:if="{{gifPreviewPath}}" class="preview-wrap">
+          <image class="preview-image" src="{{gifPreviewPath}}" mode="aspectFit" />
+        </view>
+        <button class="primary-btn gradient-bg shadow-soft {{isConverting ? 'is-disabled' : ''}}" bindtap="chooseVideo" disabled="{{isConverting}}">
+          {{isConverting ? '转换中 ' + progress + '%' : '选择视频并转换'}}
+        </button>
+      </view>
+
+      <view wx:if="{{showProgress}}" class="progress-wrap">
+        <view class="progress-head">
+          <text>{{progressLabel}}</text>
+          <text>{{progress}}%</text>
+        </view>
+        <view class="progress-track">
+          <view class="progress-bar" style="width: {{progress}}%;"></view>
+        </view>
+      </view>
+    </view>
+
+    <canvas type="2d" id="convertCanvas" class="hidden-canvas" style="width: {{canvasWidth}}px; height: {{canvasHeight}}px;"></canvas>
+  </view>
+</view>

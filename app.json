@@ -1,6 +1,11 @@
 {
   "pages": [
-    "pages/index/index"
+    "pages/index/index",
+    "pages/history/history",
+    "pages/history-detail/history-detail",
+    "pages/live-photo/live-photo",
+    "pages/format-convert/format-convert",
+    "pages/bind-email/bind-email"
   ],
   "window": {
     "navigationStyle": "custom",

@@ -12,30 +12,10 @@
           <view class="icon icon-sparkles icon-white"></view>
         </view>
         <text class="title">去水印</text>
-        <text class="subtitle">一键去除图片和视频水印</text>
+        <text class="subtitle">粘贴链接，一键解析无水印内容</text>
       </view>
 
-      <view class="glass rounded-2xl mode-card shadow-soft fade-in">
-        <view class="mode-row">
-          <button class="mode-btn {{activeMode === 'link' ? 'mode-active' : ''}}" data-mode="link" bindtap="switchMode">
-            <view class="mode-bg" wx:if="{{activeMode === 'link'}}"></view>
-            <view class="icon icon-link mode-icon"></view>
-            <text class="mode-label">链接解析</text>
-          </button>
-          <button class="mode-btn {{activeMode === 'image' ? 'mode-active' : ''}}" data-mode="image" bindtap="switchMode">
-            <view class="mode-bg" wx:if="{{activeMode === 'image'}}"></view>
-            <view class="icon icon-image mode-icon"></view>
-            <text class="mode-label">图片</text>
-          </button>
-          <button class="mode-btn {{activeMode === 'video' ? 'mode-active' : ''}}" data-mode="video" bindtap="switchMode">
-            <view class="mode-bg" wx:if="{{activeMode === 'video'}}"></view>
-            <view class="icon icon-video mode-icon"></view>
-            <text class="mode-label">视频</text>
-          </button>
-        </view>
-      </view>
-
-      <view wx:if="{{activeMode === 'link'}}" class="content-slide">
+      <view class="content-slide">
         <view class="glass rounded-2xl input-card shadow-soft">
           <view wx:if="{{!showParseResult}}" class="input-col">
             <view class="input-wrap">
@@ -71,8 +51,30 @@
               object-fit="contain"
             />
 
+            <view wx:elif="{{images.length}}" class="result-gallery">
+              <swiper
+                class="result-swiper"
+                current="{{imageCurrent}}"
+                bindchange="onImageSwiperChange"
+                circular="{{images.length > 1}}"
+                indicator-dots="{{images.length > 1}}"
+                indicator-color="rgba(255,255,255,0.4)"
+                indicator-active-color="#35bd94"
+              >
+                <swiper-item wx:for="{{images}}" wx:key="url">
+                  <image
+                    class="result-image"
+                    src="{{item.url}}"
+                    mode="aspectFit"
+                    bindtap="previewImages"
+                  />
+                </swiper-item>
+              </swiper>
+              <text wx:if="{{images.length > 1}}" class="result-gallery-count">{{imageCurrent + 1}} / {{images.length}}</text>
+            </view>
+
             <view class="result-meta">
-              <text class="result-meta-label">视频标题</text>
+              <text class="result-meta-label">{{parseResult.videoUrl ? '视频标题' : '作品标题'}}</text>
               <text class="result-title">{{parseResult.title}}</text>
             </view>
 
@@ -80,12 +82,15 @@
               <button class="result-btn gradient-bg shadow-soft {{isSavingVideo ? 'is-disabled' : ''}}" bindtap="saveVideo" disabled="{{isSavingVideo}}">
                 {{isSavingVideo ? '保存中...' : '保存到相册'}}
               </button>
+              <button wx:if="{{hasLivePhoto}}" class="result-btn result-btn-outline {{isSavingLive ? 'is-disabled' : ''}}" bindtap="saveLivePhotos" disabled="{{isSavingLive}}">
+                {{isSavingLive ? '保存中...' : '保存 Live Photo'}}
+              </button>
               <button class="result-btn result-btn-outline" bindtap="copyTitle">复制标题</button>
             </view>
 
             <view wx:if="{{showDownloadProgress}}" class="download-progress">
               <view class="download-progress-head">
-                <text class="download-progress-label">{{downloadPhase === 'saving' ? '正在写入相册' : '正在下载视频'}}</text>
+                <text class="download-progress-label">{{downloadPhase === 'saving' ? '正在写入相册' : (parseResult.videoUrl ? '正在下载视频' : '正在下载图片')}}</text>
                 <text class="download-progress-value">{{downloadProgress}}%</text>
               </view>
               <view class="download-progress-track">
@@ -106,30 +111,6 @@
         </view>
       </view>
 
-      <view wx:else class="content-slide">
-        <view class="glass rounded-2xl upload-card shadow-soft">
-          <view class="upload-inner">
-            <view class="upload-icon-box float-soft">
-              <view class="icon {{activeMode === 'image' ? 'icon-camera' : 'icon-file-video'}} icon-primary icon-large"></view>
-            </view>
-            <text class="upload-title">{{activeMode === 'image' ? '上传图片' : '上传视频'}}</text>
-            <text class="upload-desc">拖拽文件到这里，或点击选择</text>
-            <button class="choose-btn gradient-bg shadow-soft" bindtap="chooseFile">
-              <view class="icon icon-upload icon-white icon-small"></view>
-              <text>选择文件</text>
-            </button>
-          </view>
-        </view>
-
-        <view class="glass rounded-xl tip-card">
-          <view class="icon icon-check icon-primary icon-tip"></view>
-          <view class="tip-copy">
-            <text class="tip-title">智能识别水印</text>
-            <text class="tip-desc">支持 {{activeMode === 'image' ? 'JPG、PNG、WebP' : 'MP4、MOV、AVI'}} 格式，最大 {{activeMode === 'image' ? '20MB' : '200MB'}}</text>
-          </view>
-        </view>
-      </view>
-
       <view class="stats-row">
         <view class="stat">
           <text class="stat-value">128.5K</text>
@@ -142,7 +123,7 @@
         </view>
         <view class="divider"></view>
         <view class="stat">
-          <text class="stat-value">&lt;3s</text>
+          <text class="stat-value">1.3s</text>
           <text class="stat-label">平均耗时</text>
         </view>
       </view>
@@ -154,25 +135,24 @@
         <text class="page-desc">发现更多实用工具</text>
       </view>
 
-      <view class="promo gradient-bg shadow-glow">
+      <view class="promo promo-soon gradient-bg shadow-glow" bindtap="onComingSoon">
         <view class="promo-orb"></view>
         <view class="promo-content">
           <view class="promo-kicker">
             <view class="icon icon-zap icon-yellow icon-small"></view>
-            <text>限时特惠</text>
+            <text>即将上线</text>
           </view>
           <text class="promo-title">会员尊享全部功能</text>
-          <text class="promo-desc">解锁所有高级工具，无限次使用</text>
-          <button class="promo-btn">
-            <text>立即开通</text>
-            <view class="icon icon-arrow-right icon-primary icon-small"></view>
-          </button>
+          <text class="promo-desc">个人主体小程序暂不支持支付，会员功能筹备中</text>
+          <view class="promo-btn promo-btn-disabled">
+            <text>敬请期待</text>
+          </view>
         </view>
         <view class="icon icon-star promo-star"></view>
       </view>
 
-      <view class="product-list">
-        <view class="glass rounded-2xl product-card shadow-soft" wx:for="{{products}}" wx:key="id">
+        <view class="product-list">
+        <view class="glass rounded-2xl product-card shadow-soft" wx:for="{{products}}" wx:key="id" data-page="{{item.page}}" bindtap="onProductTap">
           <view class="product-icon-wrap {{item.bgClass}}">
             <view class="product-icon-core {{item.colorClass}}">
               <view class="icon {{item.iconClass}} icon-white icon-product"></view>
@@ -197,53 +177,59 @@
         <view class="user-row">
           <view class="avatar-wrap">
             <view class="avatar gradient-bg shadow-glow">
-              <text class="avatar-text">U</text>
-            </view>
-            <view class="crown-badge pulse">
-              <view class="icon icon-crown icon-white icon-tiny"></view>
+              <text class="avatar-text">{{userInitial}}</text>
             </view>
           </view>
           <view class="user-info">
             <view class="name-row">
-              <text class="user-name">用户昵称</text>
-              <text class="vip-badge">VIP</text>
+              <text class="user-name">{{user.nickname || '游客'}}</text>
+              <text wx:if="{{user.isGuest}}" class="guest-badge">游客</text>
             </view>
-            <text class="user-id">ID: 88888888</text>
-          </view>
-          <view class="edit-btn">
-            <view class="icon icon-settings icon-muted"></view>
+            <text class="user-id">ID: {{userDisplayId}}</text>
+            <text wx:if="{{emailBound}}" class="user-email">{{user.email}}</text>
           </view>
         </view>
+      </view>
 
-        <view class="member-card">
-          <view class="member-info">
-            <view class="member-title-row">
-              <view class="icon icon-crown icon-amber icon-small"></view>
-              <text class="member-title">年度会员</text>
-            </view>
-            <text class="member-desc">有效期至 2025年12月31日</text>
+      <view class="glass rounded-2xl menu-card shadow-soft profile-action-card">
+        <view class="menu-item" bindtap="goBindEmail">
+          <view class="menu-icon-box">
+            <view class="icon icon-mail icon-primary icon-menu"></view>
           </view>
-          <view class="renew-btn">续费</view>
+          <view class="menu-copy">
+            <text class="menu-title">绑定邮箱</text>
+            <text class="menu-desc">{{emailBound ? '已绑定，点击查看' : '绑定后可接收通知与找回账号'}}</text>
+          </view>
+          <view class="icon icon-chevron-right icon-muted icon-small"></view>
         </view>
+      </view>
+
+      <view class="glass rounded-2xl member-soon-card shadow-soft" bindtap="onComingSoon">
+        <view class="member-soon-head">
+          <view class="icon icon-crown icon-amber icon-small"></view>
+          <text class="member-soon-title">会员功能</text>
+          <text class="member-soon-tag">敬请期待</text>
+        </view>
+        <text class="member-soon-desc">即将上线</text>
       </view>
 
       <view class="glass rounded-2xl usage-card shadow-soft">
         <view class="usage-item">
-          <text class="usage-value">1,286</text>
+          <text class="usage-value">{{usageCount}}</text>
           <text class="usage-label">处理次数</text>
         </view>
         <view class="usage-item">
-          <text class="usage-value">42h</text>
+          <text class="usage-value">—</text>
           <text class="usage-label">节省时间</text>
         </view>
         <view class="usage-item">
-          <text class="usage-value">15天</text>
+          <text class="usage-value">—</text>
           <text class="usage-label">连续使用</text>
         </view>
       </view>
 
       <view class="glass rounded-2xl menu-card shadow-soft">
-        <view class="menu-item {{index !== menuItems.length - 1 ? 'has-border' : ''}}" wx:for="{{menuItems}}" wx:key="id">
+        <view class="menu-item {{index !== menuItems.length - 1 ? 'has-border' : ''}}" wx:for="{{menuItems}}" wx:key="id" data-id="{{item.id}}" bindtap="onMenuTap">
           <view class="menu-icon-box">
             <view class="icon {{item.iconClass}} icon-primary icon-menu"></view>
           </view>

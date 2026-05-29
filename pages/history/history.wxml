@@ -1,0 +1,44 @@
+<view class="subpage">
+  <view class="sub-bg"></view>
+  <view class="sub-main" style="padding-top: {{statusBarHeight}}px;">
+    <view class="sub-nav">
+      <view class="sub-nav-back" bindtap="goBack">
+        <view class="icon icon-back"></view>
+      </view>
+      <text class="sub-nav-title">处理记录</text>
+      <text wx:if="{{list.length}}" class="sub-nav-action" bindtap="clearAll">清空</text>
+    </view>
+
+    <view wx:if="{{!list.length}}" class="glass rounded-2xl shadow-soft empty-wrap">
+      <text class="empty-title">暂无解析记录</text>
+      <text class="empty-desc">去水印页解析成功后，会自动保存在这里</text>
+      <button class="primary-btn gradient-bg shadow-soft empty-btn" bindtap="goParse">去解析链接</button>
+    </view>
+
+    <view wx:else class="history-list">
+      <view
+        class="glass rounded-2xl shadow-soft history-item"
+        wx:for="{{list}}"
+        wx:key="id"
+        data-id="{{item.id}}"
+        bindtap="openDetail"
+      >
+        <view class="history-thumb-wrap">
+          <image wx:if="{{item.thumbUrl}}" class="history-thumb" src="{{item.thumbUrl}}" mode="aspectFill" />
+          <view wx:else class="history-thumb history-thumb-video">
+            <view class="icon icon-video icon-primary"></view>
+          </view>
+        </view>
+        <view class="history-copy">
+          <view class="history-title-row">
+            <text class="history-title">{{item.title || '未命名作品'}}</text>
+            <text wx:if="{{item.hasLive}}" class="badge-tag badge-live">Live</text>
+          </view>
+          <text class="history-meta">{{item.typeLabel}} · {{item.timeLabel}}</text>
+          <text class="history-link">{{item.sourceUrl}}</text>
+        </view>
+        <view class="icon icon-chevron-right icon-muted"></view>
+      </view>
+    </view>
+  </view>
+</view>

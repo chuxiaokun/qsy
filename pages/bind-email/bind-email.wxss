@@ -1,0 +1,135 @@
+@import "../../styles/subpage.wxss";
+
+.form-card {
+  padding: 40rpx 32rpx;
+}
+
+.form-tip {
+  display: block;
+  margin-bottom: 40rpx;
+  color: #76827f;
+  font-size: 26rpx;
+  line-height: 1.55;
+}
+
+.field {
+  margin-bottom: 32rpx;
+}
+
+.field-label {
+  display: block;
+  margin-bottom: 16rpx;
+  color: #2f3b39;
+  font-size: 28rpx;
+  font-weight: 500;
+}
+
+.field-input {
+  width: 100%;
+  height: 96rpx;
+  padding: 0 28rpx;
+  color: #2f3b39;
+  font-size: 28rpx;
+  background: rgba(235, 246, 247, 0.82);
+  border-radius: 24rpx;
+  box-sizing: border-box;
+}
+
+.field-placeholder {
+  color: #87928f;
+}
+
+.code-row {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.code-input {
+  flex: 1;
+  min-width: 0;
+}
+
+.code-btn {
+  flex-shrink: 0;
+  height: 96rpx;
+  padding: 0 28rpx;
+  color: #35bd94;
+  font-size: 26rpx;
+  font-weight: 500;
+  line-height: 96rpx;
+  background: rgba(64, 199, 159, 0.12);
+  border-radius: 24rpx;
+}
+
+.code-btn.is-disabled {
+  opacity: 0.5;
+}
+
+.submit-btn {
+  width: 100%;
+  margin-top: 16rpx;
+}
+
+.submit-btn.is-disabled {
+  opacity: 0.5;
+}
+
+.bound-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32rpx 0 8rpx;
+  text-align: center;
+}
+
+.bound-icon {
+  width: 64rpx;
+  height: 64rpx;
+  margin-bottom: 24rpx;
+}
+
+.bound-email {
+  color: #2f3b39;
+  font-size: 32rpx;
+  font-weight: 600;
+}
+
+.bound-hint {
+  margin-top: 16rpx;
+  color: #76827f;
+  font-size: 24rpx;
+}
+
+.icon-check::before {
+  content: "";
+  position: absolute;
+  inset: 4rpx;
+  border: 4rpx solid currentColor;
+  border-radius: 50%;
+}
+
+.icon-check::after {
+  content: "";
+  position: absolute;
+  left: 13rpx;
+  top: 16rpx;
+  width: 14rpx;
+  height: 8rpx;
+  border-left: 4rpx solid currentColor;
+  border-bottom: 4rpx solid currentColor;
+  transform: rotate(-45deg);
+}
+
+.icon {
+  display: inline-block;
+  position: relative;
+  width: 40rpx;
+  height: 40rpx;
+  color: currentColor;
+  flex-shrink: 0;
+}
+
+.icon-primary {
+  color: #35bd94;
+}

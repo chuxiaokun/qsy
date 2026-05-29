@@ -1,0 +1,88 @@
+@import "../../styles/subpage.wxss";
+
+.tip-card {
+  display: flex;
+  gap: 20rpx;
+  align-items: flex-start;
+}
+
+.tip-icon {
+  flex-shrink: 0;
+  margin-top: 4rpx;
+}
+
+.tip-title {
+  display: block;
+  margin-bottom: 8rpx;
+  color: #2f3b39;
+  font-size: 30rpx;
+  font-weight: 600;
+}
+
+.tip-desc {
+  display: block;
+  color: #76827f;
+  font-size: 26rpx;
+  line-height: 1.6;
+}
+
+.live-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.live-item {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+}
+
+.live-thumb {
+  width: 120rpx;
+  height: 120rpx;
+  flex-shrink: 0;
+  border-radius: 20rpx;
+  background: #eef6f5;
+}
+
+.live-copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.live-title {
+  display: block;
+  margin-bottom: 8rpx;
+  overflow: hidden;
+  color: #2f3b39;
+  font-size: 28rpx;
+  font-weight: 600;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.live-time {
+  display: block;
+  color: #9aa5a2;
+  font-size: 24rpx;
+}
+
+.live-save-btn {
+  flex-shrink: 0;
+  height: 64rpx;
+  padding: 0 28rpx;
+  color: #fff;
+  font-size: 26rpx;
+  font-weight: 600;
+  line-height: 64rpx;
+  border-radius: 999rpx;
+}
+
+.batch-btn {
+  margin-top: 8rpx;
+}
+
+.empty-btn {
+  margin-top: 40rpx;
+}
