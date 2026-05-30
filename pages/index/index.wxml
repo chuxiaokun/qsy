@@ -176,7 +176,8 @@
       <view class="glass rounded-3xl user-card shadow-soft fade-down">
         <view class="user-row">
           <view class="avatar-wrap">
-            <view class="avatar gradient-bg shadow-glow">
+            <image wx:if="{{user.avatarUrl}}" class="avatar avatar-img shadow-glow" src="{{user.avatarUrl}}" mode="aspectFill" />
+            <view wx:else class="avatar gradient-bg shadow-glow">
               <text class="avatar-text">{{userInitial}}</text>
             </view>
           </view>
@@ -253,6 +254,32 @@
       </view>
 
       <text class="version">版本 1.0.0</text>
+    </view>
+  </view>
+
+  <view wx:if="{{showProfileModal}}" class="profile-modal-mask" catchtouchmove="preventModalMove">
+    <view class="profile-modal glass rounded-2xl shadow-soft">
+      <text class="profile-modal-title">完善个人资料</text>
+      <text class="profile-modal-desc">选择头像并填写昵称，用于个人中心展示</text>
+      <button class="profile-modal-avatar-btn" open-type="chooseAvatar" bindchooseavatar="onModalChooseAvatar">
+        <image wx:if="{{modalAvatarUrl}}" class="profile-modal-avatar-img" src="{{modalAvatarUrl}}" mode="aspectFill" />
+        <view wx:else class="profile-modal-avatar-placeholder">
+          <text class="profile-modal-avatar-plus">+</text>
+          <text class="profile-modal-avatar-hint">选择头像</text>
+        </view>
+      </button>
+      <input
+        class="profile-modal-nickname"
+        type="nickname"
+        placeholder="请输入昵称"
+        value="{{modalNickname}}"
+        bindinput="onModalNicknameInput"
+        bindblur="onModalNicknameBlur"
+      />
+      <button class="profile-modal-save" bindtap="onSaveProfile" loading="{{profileSaving}}" disabled="{{profileSaving}}">
+        保存
+      </button>
+      <button class="profile-modal-skip" bindtap="onDismissProfileModal">稍后再说</button>
     </view>
   </view>
 

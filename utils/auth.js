@@ -1,11 +1,57 @@
-const { CLOUD_ENV } = require("./config")
+const { CLOUD_ENV, API_BASE } = require("./config")
 
 const STORAGE_USER = "mp_user"
 const STORAGE_TOKEN = "mp_token"
 const STORAGE_PUBLIC_ID = "mp_public_id"
+const STORAGE_PROFILE_DISMISS = "mp_profile_dismiss"
+
+function apiReady() {
+  return !!(API_BASE && String(API_BASE).trim())
+}
 
 function cloudReady() {
   return !!(wx.cloud && CLOUD_ENV)
+}
+
+function apiBase() {
+  return String(API_BASE).trim().replace(/\/$/, "")
+}
+
+function requestApi(path, data = {}, method = "POST") {
+  return new Promise((resolve, reject) => {
+    if (!apiReady()) {
+      reject(new Error("未配置 API_BASE"))
+      return
+    }
+    wx.request({
+      url: `${apiBase()}${path}`,
+      method,
+      header: { "content-type": "application/json" },
+      data,
+      success: (res) => {
+        const status = res.statusCode || 0
+        const body = res.data || {}
+        if (status >= 200 && status < 300) {
+          resolve(body)
+          return
+        }
+        reject(new Error(body.msg || `请求失败(${status})`))
+      },
+      fail: (err) => reject(err.errMsg ? new Error(err.errMsg) : err)
+    })
+  })
+}
+
+function wxLoginCode() {
+  return new Promise((resolve, reject) => {
+    wx.login({
+      success: (res) => {
+        if (res.code) resolve(res.code)
+        else reject(new Error("微信登录失败"))
+      },
+      fail: reject
+    })
+  })
 }
 
 function callCloud(name, data = {}) {
@@ -60,13 +106,27 @@ function ensureLocalGuest() {
   return user
 }
 
+function resolveAvatarUrl(url) {
+  const raw = (url || "").trim()
+  if (!raw) return ""
+  if (/^https?:\/\//i.test(raw)) {
+    if (apiReady() && apiBase().startsWith("https://") && raw.startsWith("http://")) {
+      return `https://${raw.slice(7)}`
+    }
+    return raw
+  }
+  if (!apiReady()) return raw
+  const rel = raw.startsWith("/") ? raw : `/${raw}`
+  return `${apiBase()}${rel}`
+}
+
 function normalizeUser(raw) {
   if (!raw) return null
   return {
     id: raw.id || raw.userId || raw._id || "",
     publicId: raw.publicId || raw.public_id || raw.displayId || 0,
     nickname: raw.nickname || raw.nick_name || "用户",
-    avatarUrl: raw.avatarUrl || raw.avatar_url || "",
+    avatarUrl: resolveAvatarUrl(raw.avatarUrl || raw.avatar_url || ""),
     email: raw.email || "",
     emailVerified: !!(raw.emailVerified || raw.email_verified),
     isGuest: raw.isGuest === true || raw.is_guest === true,
@@ -85,10 +145,33 @@ async function loginWithCloud() {
   throw new Error(body.msg || "登录失败")
 }
 
+async function loginWithApi() {
+  const code = await wxLoginCode()
+  const body = await requestApi("/api/login", { code })
+  if (body.code === 200 && body.data) {
+    const { token, user } = body.data
+    const normalized = normalizeUser(user)
+    saveSession(token, normalized)
+    return normalized
+  }
+  throw new Error(body.msg || "登录失败")
+}
+
 /**
- * 启动时云函数静默登录（openid）；失败则本地游客
+ * 启动时静默登录：优先自建 API，否则云函数；失败则本地游客
  */
 async function ensureLogin() {
+  if (apiReady()) {
+    try {
+      return await loginWithApi()
+    } catch {
+      const cached = getUser()
+      if (cached && !cached.isLocal) return cached
+      if (cached && cached.isLocal) return cached
+      return ensureLocalGuest()
+    }
+  }
+
   if (!cloudReady()) {
     const cached = getUser()
     if (cached) return cached
@@ -146,6 +229,72 @@ function refreshUserFromStorage() {
   return getUser()
 }
 
+function needsProfileSetup(user) {
+  if (!user || user.isLocal || user.isGuest) return false
+  if (!apiReady()) return false
+  if (wx.getStorageSync(STORAGE_PROFILE_DISMISS)) return false
+  return !user.avatarUrl
+}
+
+function dismissProfileSetup() {
+  wx.setStorageSync(STORAGE_PROFILE_DISMISS, 1)
+}
+
+function clearProfileDismiss() {
+  wx.removeStorageSync(STORAGE_PROFILE_DISMISS)
+}
+
+/**
+ * 上传头像并保存昵称（POST /api/user/profile，multipart）
+ */
+function saveUserProfile(avatarPath, nickname) {
+  return new Promise((resolve, reject) => {
+    const token = getToken()
+    if (!token) {
+      reject(new Error("请先登录"))
+      return
+    }
+    if (!apiReady()) {
+      reject(new Error("未配置 API_BASE"))
+      return
+    }
+    const name = (nickname || "").trim()
+    if (!name) {
+      reject(new Error("请填写昵称"))
+      return
+    }
+    if (!avatarPath) {
+      reject(new Error("请选择头像"))
+      return
+    }
+
+    wx.uploadFile({
+      url: `${apiBase()}/api/user/profile`,
+      filePath: avatarPath,
+      name: "avatar",
+      header: { Authorization: `Bearer ${token}` },
+      formData: { nickname: name },
+      success: (res) => {
+        let body = {}
+        try {
+          body = typeof res.data === "string" ? JSON.parse(res.data) : res.data || {}
+        } catch {
+          body = {}
+        }
+        if (res.statusCode >= 200 && res.statusCode < 300 && body.code === 200 && body.data) {
+          const user = normalizeUser(body.data.user)
+          saveSession(token, user)
+          clearProfileDismiss()
+          resolve(user)
+          return
+        }
+        reject(new Error(body.msg || `保存失败(${res.statusCode})`))
+      },
+      fail: (err) => reject(err.errMsg ? new Error(err.errMsg) : err)
+    })
+  })
+}
+
 module.exports = {
   ensureLogin,
   getUser,
@@ -158,5 +307,9 @@ module.exports = {
   refreshUserFromStorage,
   saveSession,
   ensureLocalGuest,
-  callCloud
+  callCloud,
+  apiReady,
+  needsProfileSetup,
+  dismissProfileSetup,
+  saveUserProfile
 }

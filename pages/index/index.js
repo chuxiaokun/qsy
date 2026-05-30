@@ -81,7 +81,11 @@ Page({
     userDisplayId: "——",
     userInitial: "游",
     emailBound: false,
-    usageCount: 0
+    usageCount: 0,
+    showProfileModal: false,
+    modalAvatarUrl: "",
+    modalNickname: "",
+    profileSaving: false
   },
 
   onLoad() {
@@ -118,6 +122,17 @@ Page({
     const user = auth.refreshUserFromStorage() || getApp().globalData.user
     if (user) this.applyUser(user)
     this.setData({ usageCount: historyStore.getList().length })
+    this.maybeShowProfileModal(user)
+  },
+
+  maybeShowProfileModal(user) {
+    const u = user || auth.refreshUserFromStorage() || getApp().globalData.user
+    if (!auth.needsProfileSetup(u)) return
+    this.setData({
+      showProfileModal: true,
+      modalAvatarUrl: "",
+      modalNickname: u.nickname && !/^用户\d{4}$/.test(u.nickname) ? u.nickname : ""
+    })
   },
 
   switchTab(event) {
@@ -125,6 +140,55 @@ Page({
     this.setData({ activeTab: tab })
     if (tab === "profile") this.refreshProfile()
   },
+
+  onModalChooseAvatar(event) {
+    const { avatarUrl } = event.detail || {}
+    if (avatarUrl) this.setData({ modalAvatarUrl: avatarUrl })
+  },
+
+  onModalNicknameInput(event) {
+    this.setData({ modalNickname: (event.detail && event.detail.value) || "" })
+  },
+
+  onModalNicknameBlur(event) {
+    const value = (event.detail && event.detail.value) || ""
+    if (value) this.setData({ modalNickname: value })
+  },
+
+  onDismissProfileModal() {
+    auth.dismissProfileSetup()
+    this.setData({ showProfileModal: false })
+  },
+
+  onSaveProfile() {
+    const { modalAvatarUrl, modalNickname, profileSaving } = this.data
+    if (profileSaving) return
+    const nickname = (modalNickname || "").trim()
+    if (!modalAvatarUrl) {
+      wx.showToast({ title: "请先选择头像", icon: "none" })
+      return
+    }
+    if (!nickname) {
+      wx.showToast({ title: "请填写昵称", icon: "none" })
+      return
+    }
+    this.setData({ profileSaving: true })
+    auth
+      .saveUserProfile(modalAvatarUrl, nickname)
+      .then((user) => {
+        const app = getApp()
+        if (app.globalData) app.globalData.user = user
+        this.applyUser(user)
+        this.setData({ showProfileModal: false, profileSaving: false })
+        wx.showToast({ title: "资料已保存", icon: "success" })
+      })
+      .catch((err) => {
+        this.setData({ profileSaving: false })
+        wx.showToast({ title: (err && err.message) || "保存失败", icon: "none" })
+      })
+  },
+
+  preventModalMove() {},
 
   goBindEmail() {
     wx.navigateTo({ url: "/pages/bind-email/bind-email" })
