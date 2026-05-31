@@ -1,6 +1,7 @@
 const historyStore = require("../../utils/history")
 const media = require("../../utils/media")
 const auth = require("../../utils/auth")
+const parseApi = require("../../utils/parse")
 
 const platforms = [
   { id: "douyin", name: "抖音", dotClass: "dot-pink" },
@@ -251,8 +252,8 @@ Page({
       hasLivePhoto: false
     })
     const link = this.data.linkInput.trim()
-    auth
-      .callCloud("parseVideo", { url: link })
+    parseApi
+      .parseLink(link)
       .then((body) => {
         if (body.code === 200 && body.data) {
           wx.showToast({
@@ -295,7 +296,7 @@ Page({
       })
       .catch((err) => {
         wx.showToast({
-          title: (err && err.message) || "云函数调用失败，请确认已部署 parseVideo",
+          title: (err && err.message) || "解析请求失败",
           icon: "none"
         })
       })
