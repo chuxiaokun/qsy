@@ -24,3 +24,68 @@ button {
 button::after {
   display: none;
 }
+
+.profile-modal-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48rpx;
+  background: rgba(20, 35, 32, 0.45);
+}
+
+.profile-modal {
+  width: 100%;
+  max-width: 620rpx;
+  padding: 48rpx 40rpx 40rpx;
+  box-sizing: border-box;
+}
+
+.profile-modal-title {
+  display: block;
+  color: #2f3b39;
+  font-size: 36rpx;
+  font-weight: 700;
+  text-align: center;
+}
+
+.profile-modal-desc {
+  display: block;
+  margin-top: 16rpx;
+  margin-bottom: 32rpx;
+  color: #6b7c78;
+  font-size: 26rpx;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.profile-modal-save {
+  width: 100%;
+  height: 88rpx;
+  margin-bottom: 16rpx;
+  color: #fff;
+  font-size: 30rpx;
+  font-weight: 600;
+  line-height: 88rpx;
+  background: linear-gradient(135deg, #2d9f7a 0%, #3bb88e 100%);
+  border: none;
+  border-radius: 20rpx;
+}
+
+.profile-modal-save-outline {
+  color: #2d9f7a;
+  background: rgba(255, 255, 255, 0.85);
+  border: 2rpx solid rgba(45, 159, 122, 0.35);
+}
+
+.profile-modal-skip {
+  width: 100%;
+  height: 72rpx;
+  color: #6b7c78;
+  font-size: 28rpx;
+  line-height: 72rpx;
+  background: transparent;
+  border: none;
+}

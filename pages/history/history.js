@@ -3,7 +3,8 @@ const historyStore = require("../../utils/history")
 Page({
   data: {
     statusBarHeight: 0,
-    list: []
+    list: [],
+    loading: true
   },
 
   onLoad() {
@@ -16,7 +17,21 @@ Page({
   },
 
   loadList() {
-    this.setData({ list: historyStore.getListForDisplay() })
+    this.setData({ loading: true })
+    historyStore
+      .loadList()
+      .then((records) => {
+        this.setData({
+          list: historyStore.getListForDisplay(records),
+          loading: false
+        })
+      })
+      .catch(() => {
+        this.setData({
+          list: historyStore.getListForDisplay(),
+          loading: false
+        })
+      })
   },
 
   goBack() {
@@ -42,9 +57,10 @@ Page({
       content: "确定删除全部解析记录吗？",
       success: (res) => {
         if (!res.confirm) return
-        historyStore.clearAll()
-        this.loadList()
-        wx.showToast({ title: "已清空", icon: "success" })
+        historyStore.clearAll().then(() => {
+          this.loadList()
+          wx.showToast({ title: "已清空", icon: "success" })
+        })
       }
     })
   }

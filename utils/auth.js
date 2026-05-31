@@ -133,7 +133,15 @@ function normalizeUser(raw) {
     email: raw.email || "",
     emailVerified: !!(raw.emailVerified || raw.email_verified),
     isGuest: raw.isGuest === true || raw.is_guest === true,
-    isLocal: false
+    isLocal: false,
+    vipExpireAt: raw.vipExpireAt || raw.vip_expire_at || null,
+    isVip:
+      raw.isVip === true ||
+      raw.is_vip === true ||
+      (() => {
+        const exp = raw.vipExpireAt || raw.vip_expire_at
+        return exp ? new Date(exp).getTime() > Date.now() : false
+      })()
   }
 }
 
@@ -253,6 +261,27 @@ function refreshUserFromStorage() {
   return getUser()
 }
 
+/**
+ * 从服务端拉取最新用户资料（含 VIP），并写入本地缓存
+ */
+async function fetchUserProfile() {
+  const cached = getUser()
+  if (!apiReady() || !getToken() || (cached && cached.isLocal)) {
+    return cached || refreshUserFromStorage()
+  }
+  try {
+    const body = await requestApi("/api/user/me", {}, "GET")
+    if (body.code === 200 && body.data && body.data.user) {
+      const user = normalizeUser(body.data.user)
+      saveSession(getToken(), user)
+      return user
+    }
+  } catch {
+    // 网络失败时沿用本地缓存
+  }
+  return refreshUserFromStorage()
+}
+
 function needsProfileSetup(user) {
   if (!user || user.isLocal || user.isGuest) return false
   if (!apiReady()) return false
@@ -329,10 +358,12 @@ module.exports = {
   sendEmailCode,
   bindEmail,
   refreshUserFromStorage,
+  fetchUserProfile,
   saveSession,
   ensureLocalGuest,
   callCloud,
   apiReady,
+  requestApi,
   needsProfileSetup,
   dismissProfileSetup,
   saveUserProfile

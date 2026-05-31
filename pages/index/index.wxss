@@ -185,14 +185,16 @@
 }
 
 .input-wrap {
-  position: relative;
-  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
 }
 
 .link-input {
-  width: 100%;
+  flex: 1;
+  min-width: 0;
   height: 96rpx;
-  padding: 0 76rpx 0 32rpx;
+  padding: 0 32rpx;
   color: #2f3b39;
   font-size: 28rpx;
   background: rgba(235, 246, 247, 0.82);
@@ -204,12 +206,23 @@
 }
 
 .clear-btn {
-  position: absolute;
-  top: 24rpx;
-  right: 24rpx;
-  width: 48rpx;
-  height: 48rpx;
-  color: #76827f;
+  display: flex;
+  flex: none;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 96rpx;
+  height: 96rpx;
+  padding: 0;
+  border-radius: 24rpx;
+}
+
+.clear-x {
+  color: #fff;
+  font-size: 52rpx;
+  font-weight: 400;
+  line-height: 1;
+  transform: translateY(-2rpx);
 }
 
 .submit-btn {
@@ -921,6 +934,13 @@
 
 .profile-modal-skip::after {
   border: none;
+}
+
+.profile-modal-save-outline {
+  margin-bottom: 16rpx;
+  color: #2d9f7a;
+  background: rgba(255, 255, 255, 0.85);
+  border: 2rpx solid rgba(45, 159, 122, 0.35);
 }
 
 .crown-badge {

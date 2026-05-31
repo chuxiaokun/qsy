@@ -9,10 +9,14 @@ const PARSE_API = "https://qyapi.ipaybuy.cn/api/video"
 const PARSE_APP_ID = "116740"
 const PARSE_APP_KEY = "1a4f8drm5o0diutfrt90bd63m0a0c7lr"
 
+/** 微信激励式视频广告位 */
+const REWARDED_VIDEO_AD_UNIT = "adunit-e086a08254a2c4ec"
+
 module.exports = {
   CLOUD_ENV,
   API_BASE,
   PARSE_API,
   PARSE_APP_ID,
-  PARSE_APP_KEY
+  PARSE_APP_KEY,
+  REWARDED_VIDEO_AD_UNIT
 }

@@ -20,9 +20,9 @@
           <view wx:if="{{!showParseResult}}" class="input-col">
             <view class="input-wrap">
               <input class="link-input" value="{{linkInput}}" bindinput="onLinkInput" placeholder="粘贴视频/图片链接..." placeholder-class="placeholder" />
-              <button wx:if="{{linkInput}}" class="clear-btn" bindtap="clearLink">
-                <view class="icon icon-x"></view>
-              </button>
+              <view wx:if="{{linkInput}}" class="clear-btn gradient-bg shadow-soft" bindtap="clearLink">
+                <text class="clear-x">×</text>
+              </view>
             </view>
             <button class="submit-btn gradient-bg shadow-soft {{(!linkInput || isProcessing) ? 'is-disabled' : ''}}" bindtap="handleProcess">
               <view wx:if="{{isProcessing}}" class="spinner"></view>
@@ -208,10 +208,10 @@
       <view class="glass rounded-2xl member-soon-card shadow-soft" bindtap="onComingSoon">
         <view class="member-soon-head">
           <view class="icon icon-crown icon-amber icon-small"></view>
-          <text class="member-soon-title">会员功能</text>
-          <text class="member-soon-tag">敬请期待</text>
+          <text class="member-soon-title">{{isVip ? 'VIP 会员' : '开通 VIP'}}</text>
+          <text class="member-soon-tag">{{isVip ? '已开通' : '联系客服'}}</text>
         </view>
-        <text class="member-soon-desc">即将上线</text>
+        <text class="member-soon-desc">{{isVip ? '尊享永久免广告与全部功能' : '请联系客服开通会员'}}</text>
       </view>
 
       <view class="glass rounded-2xl usage-card shadow-soft">
@@ -253,7 +253,27 @@
         </view>
       </view>
 
-      <text class="version">版本 1.0.0</text>
+      <text class="version">{{appVersion}}</text>
+    </view>
+  </view>
+
+  <view wx:if="{{showUnlockModal}}" class="profile-modal-mask" catchtouchmove="preventUnlockModalMove">
+    <view class="profile-modal glass rounded-2xl shadow-soft">
+      <text class="profile-modal-title">解锁今日去水印</text>
+      <text class="profile-modal-desc">观看一段激励视频，即可解锁今日保存与完整使用权限；开通 VIP 永久免广告。</text>
+      <button class="profile-modal-save" bindtap="onWatchAdUnlock" loading="{{adUnlockLoading}}" disabled="{{adUnlockLoading}}">
+        看广告解锁今日
+      </button>
+      <button class="profile-modal-save profile-modal-save-outline" bindtap="onUnlockGoVip">开通 VIP</button>
+      <button class="profile-modal-skip" bindtap="onDismissUnlockModal">稍后再说</button>
+    </view>
+  </view>
+
+  <view wx:if="{{showVipContactModal}}" class="profile-modal-mask" catchtouchmove="preventUnlockModalMove">
+    <view class="profile-modal glass rounded-2xl shadow-soft">
+      <text class="profile-modal-title">开通 VIP</text>
+      <text class="profile-modal-desc">请联系客服开通 VIP 会员，尊享永久免广告与全部功能。</text>
+      <button class="profile-modal-save" bindtap="onCloseVipContactModal">知道了</button>
     </view>
   </view>
 

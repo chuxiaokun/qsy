@@ -16,7 +16,9 @@ Page({
   },
 
   onShow() {
-    this.setData({ items: historyStore.getLivePhotoItems() })
+    historyStore.loadList().then((records) => {
+      this.setData({ items: historyStore.getLivePhotoItems(records) })
+    })
   },
 
   goBack() {

@@ -63,4 +63,24 @@
       </view>
     </view>
   </view>
+
+  <view wx:if="{{showUnlockModal}}" class="profile-modal-mask" catchtouchmove="preventUnlockModalMove">
+    <view class="profile-modal glass rounded-2xl shadow-soft">
+      <text class="profile-modal-title">解锁今日去水印</text>
+      <text class="profile-modal-desc">观看一段激励视频，即可解锁今日保存权限；开通 VIP 永久免广告。</text>
+      <button class="profile-modal-save" bindtap="onWatchAdUnlock" loading="{{adUnlockLoading}}" disabled="{{adUnlockLoading}}">
+        看广告解锁今日
+      </button>
+      <button class="profile-modal-save profile-modal-save-outline" bindtap="onUnlockGoVip">开通 VIP</button>
+      <button class="profile-modal-skip" bindtap="onDismissUnlockModal">稍后再说</button>
+    </view>
+  </view>
+
+  <view wx:if="{{showVipContactModal}}" class="profile-modal-mask" catchtouchmove="preventUnlockModalMove">
+    <view class="profile-modal glass rounded-2xl shadow-soft">
+      <text class="profile-modal-title">开通 VIP</text>
+      <text class="profile-modal-desc">请联系客服开通 VIP 会员，尊享永久免广告与全部功能。</text>
+      <button class="profile-modal-save" bindtap="onCloseVipContactModal">知道了</button>
+    </view>
+  </view>
 </view>

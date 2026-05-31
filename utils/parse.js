@@ -29,13 +29,26 @@ function parseLink(url) {
   })
 }
 
+function pickVideoUrl(data) {
+  if (!data) return ""
+  return (
+    data.video_url ||
+    data.videoUrl ||
+    data.play_url ||
+    data.playUrl ||
+    data.downurl ||
+    data.down_url ||
+    ""
+  )
+}
+
 function normalizeBody(body) {
   if (body.code === 200 && body.data) {
     return {
       code: 200,
       data: {
         title: body.data.title || "",
-        video_url: body.data.video_url || "",
+        video_url: pickVideoUrl(body.data),
         images: (body.data.images || []).map((item) => ({
           url: item.url || "",
           live_photo_url: item.live_photo_url || ""

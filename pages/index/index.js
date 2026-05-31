@@ -2,6 +2,9 @@ const historyStore = require("../../utils/history")
 const media = require("../../utils/media")
 const auth = require("../../utils/auth")
 const parseApi = require("../../utils/parse")
+const entitlement = require("../../utils/entitlement")
+const unlockGate = require("../../utils/unlock-gate")
+const { getVersionLabel } = require("../../utils/version")
 
 const platforms = [
   { id: "douyin", name: "抖音", dotClass: "dot-pink" },
@@ -86,7 +89,12 @@ Page({
     showProfileModal: false,
     modalAvatarUrl: "",
     modalNickname: "",
-    profileSaving: false
+    profileSaving: false,
+    showUnlockModal: false,
+    showVipContactModal: false,
+    adUnlockLoading: false,
+    isVip: false,
+    appVersion: getVersionLabel()
   },
 
   onLoad() {
@@ -99,6 +107,10 @@ Page({
     if (this.data.activeTab === "profile") {
       this.refreshProfile()
     }
+    entitlement.refreshEntitlement().then(() => {
+      const user = auth.getUser()
+      if (user) this.setData({ isVip: entitlement.isVipUser(user) })
+    })
   },
 
   initUser() {
@@ -106,6 +118,7 @@ Page({
       const app = getApp()
       if (app.globalData) app.globalData.user = user
       this.applyUser(user)
+      entitlement.refreshEntitlement()
     })
   },
 
@@ -115,15 +128,38 @@ Page({
       user,
       userDisplayId: auth.getDisplayId(user),
       userInitial: auth.getAvatarInitial(user),
-      emailBound: auth.isEmailBound(user)
+      emailBound: auth.isEmailBound(user),
+      isVip: entitlement.isVipUser(user)
     })
   },
 
   refreshProfile() {
     const user = auth.refreshUserFromStorage() || getApp().globalData.user
     if (user) this.applyUser(user)
-    this.setData({ usageCount: historyStore.getList().length })
-    this.maybeShowProfileModal(user)
+
+    const remoteRefresh =
+      auth.apiReady() && auth.getToken() && user && !user.isLocal
+        ? auth.fetchUserProfile().then((fresh) => {
+            entitlement.resetCache()
+            return entitlement.refreshEntitlement().then(() => fresh)
+          })
+        : Promise.resolve(user)
+
+    remoteRefresh
+      .then((fresh) => {
+        const latest = auth.getUser() || fresh
+        if (latest) {
+          const app = getApp()
+          if (app.globalData) app.globalData.user = latest
+          this.applyUser(latest)
+        }
+      })
+      .catch(() => {})
+
+    historyStore.getCount().then((count) => {
+      this.setData({ usageCount: count })
+    })
+    this.maybeShowProfileModal(auth.getUser() || user)
   },
 
   maybeShowProfileModal(user) {
@@ -196,8 +232,26 @@ Page({
   },
 
   onComingSoon() {
-    wx.showToast({ title: "即将上线，敬请期待", icon: "none" })
+    unlockGate.onOpenVipModal(this)
   },
+
+  onDismissUnlockModal() {
+    unlockGate.closeUnlockModal(this)
+  },
+
+  onWatchAdUnlock() {
+    unlockGate.onWatchAdUnlock(this)
+  },
+
+  onUnlockGoVip() {
+    unlockGate.onOpenVipModal(this)
+  },
+
+  onCloseVipContactModal() {
+    unlockGate.onCloseVipContactModal(this)
+  },
+
+  preventUnlockModalMove() {},
 
   onMenuTap(event) {
     const { id } = event.currentTarget.dataset
@@ -243,66 +297,78 @@ Page({
 
   handleProcess() {
     if (!this.data.linkInput.trim() || this.data.isProcessing) return
-    this.setData({
-      isProcessing: true,
-      showParseResult: false,
-      parseResult: null,
-      images: [],
-      imageCurrent: 0,
-      hasLivePhoto: false
-    })
     const link = this.data.linkInput.trim()
-    parseApi
-      .parseLink(link)
-      .then((body) => {
-        if (body.code === 200 && body.data) {
-          wx.showToast({
-            title: "解析成功",
-            icon: "success"
-          })
-          const images = (body.data.images || [])
-            .map((item) => ({
-              url: item.url || "",
-              livePhotoUrl: item.live_photo_url || ""
-            }))
-            .filter((item) => item.url)
 
-          const parseResult = {
-            videoUrl: body.data.video_url || "",
-            title: body.data.title || ""
+    const runParse = () => {
+      this.setData({
+        isProcessing: true,
+        showParseResult: false,
+        parseResult: null,
+        images: [],
+        imageCurrent: 0,
+        hasLivePhoto: false
+      })
+      parseApi
+        .parseLink(link)
+        .then((body) => {
+          if (body.code === 200 && body.data) {
+            wx.showToast({
+              title: "解析成功",
+              icon: "success"
+            })
+            const images = (body.data.images || [])
+              .map((item) => ({
+                url: item.url || "",
+                livePhotoUrl: item.live_photo_url || ""
+              }))
+              .filter((item) => item.url)
+
+            const parseResult = {
+              videoUrl: body.data.video_url || "",
+              title: body.data.title || ""
+            }
+            const hasLivePhoto = images.some((item) => item.livePhotoUrl)
+
+            historyStore
+              .addRecord({
+                sourceUrl: link,
+                title: parseResult.title,
+                videoUrl: parseResult.videoUrl,
+                images
+              })
+              .then(() => {
+                this.setData({
+                  showParseResult: true,
+                  parseResult,
+                  images,
+                  imageCurrent: 0,
+                  hasLivePhoto
+                })
+                if (this.data.activeTab === "profile") {
+                  historyStore.getCount().then((count) => {
+                    this.setData({ usageCount: count })
+                  })
+                }
+              })
+            return
           }
-          const hasLivePhoto = images.some((item) => item.livePhotoUrl)
-
-          historyStore.addRecord({
-            sourceUrl: link,
-            title: parseResult.title,
-            videoUrl: parseResult.videoUrl,
-            images
+          wx.showToast({
+            title: body.msg || "解析失败",
+            icon: "none"
           })
-
-          this.setData({
-            showParseResult: true,
-            parseResult,
-            images,
-            imageCurrent: 0,
-            hasLivePhoto
+        })
+        .catch((err) => {
+          wx.showToast({
+            title: (err && err.message) || "解析请求失败",
+            icon: "none"
           })
-          return
-        }
-        wx.showToast({
-          title: body.msg || "解析失败",
-          icon: "none"
         })
-      })
-      .catch((err) => {
-        wx.showToast({
-          title: (err && err.message) || "解析请求失败",
-          icon: "none"
+        .finally(() => {
+          this.setData({ isProcessing: false })
         })
-      })
-      .finally(() => {
-        this.setData({ isProcessing: false })
-      })
+    }
+
+    unlockGate.requestUnlock(this, runParse)
   },
 
   copyTitle() {
@@ -338,6 +404,7 @@ Page({
     if (this.data.isSavingVideo) return
     if (!videoUrl && !images.length) return
 
+    const doSave = () => {
     media.withPhotosAlbumAuth(() => {
       this.setData({
         isSavingVideo: true,
@@ -367,12 +434,16 @@ Page({
           this.resetDownloadProgress()
         })
     })
+    }
+
+    unlockGate.requestUnlock(this, doSave)
   },
 
   saveLivePhotos() {
     const liveImages = (this.data.images || []).filter((item) => item.livePhotoUrl)
     if (!liveImages.length || this.data.isSavingLive) return
 
+    const doSave = () => {
     media.withPhotosAlbumAuth(() => {
       this.setData({
         isSavingLive: true,
@@ -394,5 +465,8 @@ Page({
           this.resetDownloadProgress()
         })
     })
+    }
+
+    unlockGate.requestUnlock(this, doSave)
   }
 })
