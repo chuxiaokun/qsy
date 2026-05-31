@@ -68,7 +68,7 @@ Page({
     if (user && user.isLocal) {
       wx.showModal({
         title: "暂无法发送验证码",
-        content: "请先完成云开发登录（部署 login 云函数并重新打开小程序），再绑定邮箱。",
+        content: "请先登录后再绑定邮箱。",
         showCancel: false
       })
       return
@@ -103,7 +103,7 @@ Page({
     if (user && user.isLocal) {
       wx.showModal({
         title: "暂无法绑定",
-        content: "请先完成云开发登录（部署 login 云函数），邮箱绑定功能上线后再试。",
+        content: "请先登录后再绑定邮箱。",
         showCancel: false
       })
       return

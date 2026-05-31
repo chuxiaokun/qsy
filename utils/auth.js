@@ -17,16 +17,19 @@ function apiBase() {
   return String(API_BASE).trim().replace(/\/$/, "")
 }
 
-function requestApi(path, data = {}, method = "POST") {
+function requestApi(path, data = {}, method = "POST", options = {}) {
   return new Promise((resolve, reject) => {
     if (!apiReady()) {
       reject(new Error("未配置 API_BASE"))
       return
     }
+    const header = { "content-type": "application/json" }
+    const token = options.token !== undefined ? options.token : getToken()
+    if (token) header.Authorization = `Bearer ${token}`
     wx.request({
       url: `${apiBase()}${path}`,
       method,
-      header: { "content-type": "application/json" },
+      header,
       data,
       success: (res) => {
         const status = res.statusCode || 0
@@ -203,12 +206,33 @@ function isEmailBound(user) {
 }
 
 async function sendEmailCode(email) {
+  if (apiReady()) {
+    const body = await requestApi("/api/user/email/send-code", { email })
+    if (body.code === 200) return body
+    throw new Error(body.msg || "发送失败")
+  }
   const body = await callCloud("sendEmailCode", { email })
   if (body.code === 200) return body
   throw new Error(body.msg || "发送失败")
 }
 
 async function bindEmail(email, code) {
+  if (apiReady()) {
+    const body = await requestApi("/api/user/email/bind", { email, code })
+    if (body.code === 200 && body.data) {
+      const user = normalizeUser(body.data.user || body.data) || {
+        ...getUser(),
+        email,
+        emailVerified: true,
+        isGuest: false
+      }
+      user.email = email
+      user.emailVerified = true
+      saveSession(getToken(), user)
+      return user
+    }
+    throw new Error(body.msg || "绑定失败")
+  }
   const body = await callCloud("bindEmail", { email, code })
   if (body.code === 200 && body.data) {
     const user = normalizeUser(body.data.user || body.data) || {
