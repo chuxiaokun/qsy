@@ -3,7 +3,9 @@ const { CLOUD_ENV } = require("./utils/config")
 
 App({
   globalData: {
-    user: null
+    user: null,
+    /** 本次启动首页通知是否已拉取过（切换 tab 不再重复弹） */
+    homeNotificationsShown: false
   },
 
   onLaunch() {

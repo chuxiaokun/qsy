@@ -5,6 +5,7 @@ const parseApi = require("../../utils/parse")
 const entitlement = require("../../utils/entitlement")
 const unlockGate = require("../../utils/unlock-gate")
 const { getVersionLabel } = require("../../utils/version")
+const appVersionApi = require("../../utils/app-version")
 const appNotifications = require("../../utils/notifications")
 
 const platforms = [
@@ -105,6 +106,13 @@ Page({
     const { statusBarHeight = 0 } = wx.getWindowInfo()
     this.setData({ statusBarHeight })
     this.initUser()
+    this.loadAppVersion()
+  },
+
+  loadAppVersion() {
+    appVersionApi.fetchVersionLabel().then((label) => {
+      if (label) this.setData({ appVersion: label })
+    })
   },
 
   onShow() {
@@ -116,7 +124,7 @@ Page({
       if (user) this.setData({ isVip: entitlement.isVipUser(user) })
     })
     if (this.data.activeTab === "remove") {
-      this.loadAndShowNotifications()
+      this.loadAndShowNotificationsOnce()
     }
   },
 
@@ -183,7 +191,13 @@ Page({
     const tab = event.currentTarget.dataset.tab
     this.setData({ activeTab: tab })
     if (tab === "profile") this.refreshProfile()
-    if (tab === "remove") this.loadAndShowNotifications()
+  },
+
+  loadAndShowNotificationsOnce() {
+    const app = getApp()
+    if (!app.globalData || app.globalData.homeNotificationsShown) return
+    app.globalData.homeNotificationsShown = true
+    this.loadAndShowNotifications()
   },
 
   loadAndShowNotifications() {
