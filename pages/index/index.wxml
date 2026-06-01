@@ -19,12 +19,19 @@
         <view class="glass rounded-2xl input-card shadow-soft">
           <view wx:if="{{!showParseResult}}" class="input-col">
             <view class="input-wrap">
-              <input class="link-input" value="{{linkInput}}" bindinput="onLinkInput" placeholder="粘贴视频/图片链接..." placeholder-class="placeholder" />
+              <input
+                class="link-input"
+                value="{{linkInput}}"
+                maxlength="-1"
+                bindinput="onLinkInput"
+                placeholder="粘贴视频/图片链接..."
+                placeholder-class="placeholder"
+              />
               <view wx:if="{{linkInput}}" class="clear-btn gradient-bg shadow-soft" bindtap="clearLink">
                 <text class="clear-x">×</text>
               </view>
             </view>
-            <button class="submit-btn gradient-bg shadow-soft {{(!linkInput || isProcessing) ? 'is-disabled' : ''}}" bindtap="handleProcess">
+            <button class="submit-btn gradient-bg shadow-soft {{linkInput === '' || isProcessing ? 'is-disabled' : ''}}" bindtap="handleProcess">
               <view wx:if="{{isProcessing}}" class="spinner"></view>
               <text wx:else class="submit-text">立即解析</text>
             </button>
@@ -230,7 +237,7 @@
       </view>
 
       <view class="glass rounded-2xl menu-card shadow-soft">
-        <view class="menu-item {{index !== menuItems.length - 1 ? 'has-border' : ''}}" wx:for="{{menuItems}}" wx:key="id" data-id="{{item.id}}" bindtap="onMenuTap">
+        <view class="menu-item {{index < menuItems.length - 1 ? 'has-border' : ''}}" wx:for="{{menuItems}}" wx:key="id" data-id="{{item.id}}" bindtap="onMenuTap">
           <view class="menu-icon-box">
             <view class="icon {{item.iconClass}} icon-primary icon-menu"></view>
           </view>
@@ -246,7 +253,7 @@
       </view>
 
       <view class="glass rounded-2xl menu-card shadow-soft settings-card">
-        <view class="setting-item {{index !== settingsItems.length - 1 ? 'has-border' : ''}}" wx:for="{{settingsItems}}" wx:key="id">
+        <view class="setting-item {{index < settingsItems.length - 1 ? 'has-border' : ''}}" wx:for="{{settingsItems}}" wx:key="id">
           <view class="icon {{item.iconClass}} icon-muted icon-setting"></view>
           <text class="setting-title">{{item.name}}</text>
           <view class="icon icon-chevron-right icon-muted icon-small"></view>
