@@ -7,7 +7,7 @@
 .form-tip {
   display: block;
   margin-bottom: 40rpx;
-  color: #76827f;
+  color: #5E7A8C;
   font-size: 26rpx;
   line-height: 1.55;
 }
@@ -19,7 +19,7 @@
 .field-label {
   display: block;
   margin-bottom: 16rpx;
-  color: #2f3b39;
+  color: #12324A;
   font-size: 28rpx;
   font-weight: 500;
 }
@@ -28,15 +28,16 @@
   width: 100%;
   height: 96rpx;
   padding: 0 28rpx;
-  color: #2f3b39;
+  color: #12324A;
   font-size: 28rpx;
-  background: rgba(235, 246, 247, 0.82);
-  border-radius: 24rpx;
+  background: #FFFFFF;
+  border: 2rpx solid rgba(18, 50, 74, 0.08);
+  border-radius: 16rpx;
   box-sizing: border-box;
 }
 
 .field-placeholder {
-  color: #87928f;
+  color: #9CB6C6;
 }
 
 .code-row {
@@ -54,12 +55,13 @@
   flex-shrink: 0;
   height: 96rpx;
   padding: 0 28rpx;
-  color: #35bd94;
+  color: #12324A;
   font-size: 26rpx;
   font-weight: 500;
   line-height: 96rpx;
-  background: rgba(64, 199, 159, 0.12);
-  border-radius: 24rpx;
+  background: #E0F2FE;
+  border: 2rpx solid rgba(56, 189, 248, 0.34);
+  border-radius: 16rpx;
 }
 
 .code-btn.is-disabled {
@@ -84,20 +86,22 @@
 }
 
 .bound-icon {
-  width: 64rpx;
-  height: 64rpx;
+  width: 40rpx;
+  height: 40rpx;
   margin-bottom: 24rpx;
+  transform: scale(1.55);
+  transform-origin: center;
 }
 
 .bound-email {
-  color: #2f3b39;
+  color: #12324A;
   font-size: 32rpx;
   font-weight: 600;
 }
 
 .bound-hint {
   margin-top: 16rpx;
-  color: #76827f;
+  color: #5E7A8C;
   font-size: 24rpx;
 }
 
@@ -126,10 +130,20 @@
   position: relative;
   width: 40rpx;
   height: 40rpx;
-  color: currentColor;
+  color: inherit;
   flex-shrink: 0;
+  line-height: 1;
+  vertical-align: middle;
+  transform-origin: center;
+}
+
+.icon::before,
+.icon::after {
+  box-sizing: border-box;
+  pointer-events: none;
+  transform-origin: center;
 }
 
 .icon-primary {
-  color: #35bd94;
+  color: #0EA5E9;
 }

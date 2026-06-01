@@ -273,6 +273,22 @@ Page({
     this.setData({ linkInput: "" })
   },
 
+  pasteFromClipboard() {
+    wx.getClipboardData({
+      success: (res) => {
+        const value = ((res && res.data) || "").trim()
+        if (!value) {
+          wx.showToast({ title: "剪贴板为空", icon: "none" })
+          return
+        }
+        this.setData({ linkInput: value })
+      },
+      fail: () => {
+        wx.showToast({ title: "读取剪贴板失败", icon: "none" })
+      }
+    })
+  },
+
   continueParse() {
     this.resetDownloadProgress()
     this.setData({

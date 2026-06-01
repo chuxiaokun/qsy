@@ -14,14 +14,14 @@
 .tip-title {
   display: block;
   margin-bottom: 8rpx;
-  color: #2f3b39;
+  color: #12324A;
   font-size: 30rpx;
   font-weight: 600;
 }
 
 .tip-desc {
   display: block;
-  color: #76827f;
+  color: #5E7A8C;
   font-size: 26rpx;
   line-height: 1.6;
 }
@@ -29,7 +29,7 @@
 .live-list {
   display: flex;
   flex-direction: column;
-  gap: 20rpx;
+  gap: 18rpx;
 }
 
 .live-item {
@@ -42,8 +42,8 @@
   width: 120rpx;
   height: 120rpx;
   flex-shrink: 0;
-  border-radius: 20rpx;
-  background: #eef6f5;
+  border-radius: 16rpx;
+  background: #E0F2FE;
 }
 
 .live-copy {
@@ -55,7 +55,7 @@
   display: block;
   margin-bottom: 8rpx;
   overflow: hidden;
-  color: #2f3b39;
+  color: #12324A;
   font-size: 28rpx;
   font-weight: 600;
   white-space: nowrap;
@@ -72,9 +72,9 @@
   flex-shrink: 0;
   height: 64rpx;
   padding: 0 28rpx;
-  color: #fff;
+  color: #12324A;
   font-size: 26rpx;
-  font-weight: 600;
+  font-weight: 800;
   line-height: 64rpx;
   border-radius: 999rpx;
 }

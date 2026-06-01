@@ -7,34 +7,57 @@
 
   <view class="main page-fade" style="padding-top: {{statusBarHeight}}px;">
     <view wx:if="{{activeTab === 'remove'}}" class="section page-section">
-      <view class="hero center fade-down">
-        <view class="hero-icon gradient-bg shadow-glow float-slow">
-          <view class="icon icon-sparkles icon-white"></view>
+      <view class="brand-hero fade-down">
+        <view class="brand-hero-copy">
+          <text class="brand-kicker">SUMMER TOOL</text>
+          <text class="title">去水印工具箱</text>
+          <text class="subtitle">粘贴链接，解析预览，一键保存高清内容</text>
         </view>
-        <text class="title">去水印</text>
-        <text class="subtitle">粘贴链接，一键解析无水印内容</text>
+        <view class="brand-mark-wrap shadow-glow">
+          <view class="brand-tool-mark">
+            <view class="icon icon-droplets icon-brand-tool"></view>
+          </view>
+        </view>
       </view>
 
       <view class="content-slide">
-        <view class="glass rounded-2xl input-card shadow-soft">
+        <view class="glass rounded-2xl input-card shadow-soft workbench-card">
           <view wx:if="{{!showParseResult}}" class="input-col">
+            <view class="card-head">
+              <view>
+                <text class="card-title">开始解析</text>
+                <text class="card-desc">支持视频、图集与 Live Photo 链接</text>
+              </view>
+              <view class="status-pill">
+                <view class="status-dot"></view>
+                <text>在线</text>
+              </view>
+            </view>
+
             <view class="input-wrap">
               <input
                 class="link-input"
                 value="{{linkInput}}"
                 maxlength="-1"
                 bindinput="onLinkInput"
-                placeholder="粘贴视频/图片链接..."
+                placeholder="粘贴视频或图片分享链接"
                 placeholder-class="placeholder"
               />
-              <view wx:if="{{linkInput}}" class="clear-btn gradient-bg shadow-soft" bindtap="clearLink">
-                <text class="clear-x">×</text>
+              <view wx:if="{{linkInput}}" class="clear-btn" bindtap="clearLink">
+                <view class="icon icon-x icon-muted icon-small"></view>
               </view>
             </view>
-            <button class="submit-btn gradient-bg shadow-soft {{linkInput === '' || isProcessing ? 'is-disabled' : ''}}" bindtap="handleProcess">
-              <view wx:if="{{isProcessing}}" class="spinner"></view>
-              <text wx:else class="submit-text">立即解析</text>
-            </button>
+
+            <view class="action-row">
+              <button class="paste-btn" bindtap="pasteFromClipboard">
+                <view class="icon icon-clipboard icon-primary icon-small"></view>
+                <text>粘贴</text>
+              </button>
+              <button class="submit-btn gradient-bg shadow-soft {{linkInput === '' || isProcessing ? 'is-disabled' : ''}}" bindtap="handleProcess">
+                <view wx:if="{{isProcessing}}" class="spinner"></view>
+                <text wx:else class="submit-text">解析并预览</text>
+              </button>
+            </view>
           </view>
 
           <view wx:else class="result-col content-slide">
@@ -66,7 +89,7 @@
                 circular="{{images.length > 1}}"
                 indicator-dots="{{images.length > 1}}"
                 indicator-color="rgba(255,255,255,0.4)"
-                indicator-active-color="#35bd94"
+                indicator-active-color="#38BDF8"
               >
                 <swiper-item wx:for="{{images}}" wx:key="url">
                   <image
@@ -108,7 +131,12 @@
         </view>
 
         <view wx:if="{{!showParseResult}}" class="glass rounded-2xl platform-card shadow-soft">
-          <text class="card-label">支持的平台</text>
+          <view class="card-head compact-head">
+            <view>
+              <text class="card-title">常用平台</text>
+              <text class="card-desc">覆盖主流短视频与图文平台</text>
+            </view>
+          </view>
           <view class="platform-grid">
             <view class="platform-item" wx:for="{{platforms}}" wx:key="id">
               <view class="platform-dot {{item.dotClass}}"></view>
@@ -118,20 +146,18 @@
         </view>
       </view>
 
-      <view class="stats-row">
-        <view class="stat">
-          <text class="stat-value">128.5K</text>
-          <text class="stat-label">今日处理</text>
+      <view class="tool-strip">
+        <view class="tool-strip-item">
+          <view class="icon icon-history icon-primary icon-small"></view>
+          <text>自动记录</text>
         </view>
-        <view class="divider"></view>
-        <view class="stat">
-          <text class="stat-value">99.8%</text>
-          <text class="stat-label">成功率</text>
+        <view class="tool-strip-item">
+          <view class="icon icon-image icon-primary icon-small"></view>
+          <text>图集预览</text>
         </view>
-        <view class="divider"></view>
-        <view class="stat">
-          <text class="stat-value">1.3s</text>
-          <text class="stat-label">平均耗时</text>
+        <view class="tool-strip-item">
+          <view class="icon icon-live icon-primary icon-small"></view>
+          <text>Live 保存</text>
         </view>
       </view>
     </view>
@@ -158,7 +184,7 @@
         <view class="icon icon-star promo-star"></view>
       </view>
 
-        <view class="product-list">
+      <view class="product-list">
         <view class="glass rounded-2xl product-card shadow-soft" wx:for="{{products}}" wx:key="id" data-page="{{item.page}}" bindtap="onProductTap">
           <view class="product-icon-wrap {{item.bgClass}}">
             <view class="product-icon-core {{item.colorClass}}">
@@ -186,6 +212,9 @@
             <image wx:if="{{user.avatarUrl}}" class="avatar avatar-img shadow-glow" src="{{user.avatarUrl}}" mode="aspectFill" />
             <view wx:else class="avatar gradient-bg shadow-glow">
               <text class="avatar-text">{{userInitial}}</text>
+            </view>
+            <view wx:if="{{isVip}}" class="vip-crown-badge">
+              <view class="icon icon-crown vip-crown-icon"></view>
             </view>
           </view>
           <view class="user-info">

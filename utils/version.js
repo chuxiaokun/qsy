@@ -1,15 +1,15 @@
 // 本文件由 scripts/gen-version.js 自动生成，请勿手改
-// 生成时间：2026-05-31T10:58:49.644Z
-// 三仓：xiaoe@330e36d(7) api@90a9013(2) admin@f545d8b(2)
+// 生成时间：2026-06-01T08:21:39.404Z
+// 三仓：xiaoe@eb7b916(9) api@—(0) admin@—(0)
 
 const APP_VERSION = "1.2.0"
-const BUILD_NUMBER = 11
-const RELEASE_DATE = "2026-05-31"
+const BUILD_NUMBER = 9
+const RELEASE_DATE = "2026-06-01"
 
 const REPOS = {
-  xiaoe: { commits: 7, hash: "330e36d" },
-  api: { commits: 2, hash: "90a9013" },
-  admin: { commits: 2, hash: "f545d8b" }
+  xiaoe: { commits: 9, hash: "eb7b916" },
+  api: { commits: 0, hash: "—" },
+  admin: { commits: 0, hash: "—" }
 }
 
 /** 个人中心展示：版本 1.2.0 */
