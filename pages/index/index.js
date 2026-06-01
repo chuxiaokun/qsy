@@ -5,6 +5,7 @@ const parseApi = require("../../utils/parse")
 const entitlement = require("../../utils/entitlement")
 const unlockGate = require("../../utils/unlock-gate")
 const { getVersionLabel } = require("../../utils/version")
+const appNotifications = require("../../utils/notifications")
 
 const platforms = [
   { id: "douyin", name: "抖音", dotClass: "dot-pink" },
@@ -94,7 +95,10 @@ Page({
     showVipContactModal: false,
     adUnlockLoading: false,
     isVip: false,
-    appVersion: getVersionLabel()
+    appVersion: getVersionLabel(),
+    noticeQueue: [],
+    showNoticeModal: false,
+    currentNotice: null
   },
 
   onLoad() {
@@ -111,6 +115,9 @@ Page({
       const user = auth.getUser()
       if (user) this.setData({ isVip: entitlement.isVipUser(user) })
     })
+    if (this.data.activeTab === "remove") {
+      this.loadAndShowNotifications()
+    }
   },
 
   initUser() {
@@ -176,7 +183,49 @@ Page({
     const tab = event.currentTarget.dataset.tab
     this.setData({ activeTab: tab })
     if (tab === "profile") this.refreshProfile()
+    if (tab === "remove") this.loadAndShowNotifications()
   },
+
+  loadAndShowNotifications() {
+    appNotifications.fetchActiveNotifications().then((list) => {
+      const items = (list || []).filter((item) => item && item.title)
+      if (!items.length) return
+      this.setData({ noticeQueue: items })
+      this.showNextNotice()
+    })
+  },
+
+  canShowNoticeNow() {
+    const {
+      showProfileModal,
+      showUnlockModal,
+      showVipContactModal,
+      showNoticeModal
+    } = this.data
+    return !showProfileModal && !showUnlockModal && !showVipContactModal && !showNoticeModal
+  },
+
+  showNextNotice() {
+    if (!this.canShowNoticeNow()) return
+    const queue = this.data.noticeQueue || []
+    if (!queue.length) {
+      this.setData({ showNoticeModal: false, currentNotice: null })
+      return
+    }
+    const [currentNotice, ...rest] = queue
+    this.setData({
+      noticeQueue: rest,
+      currentNotice,
+      showNoticeModal: true
+    })
+  },
+
+  onDismissNotice() {
+    this.setData({ showNoticeModal: false, currentNotice: null })
+    setTimeout(() => this.showNextNotice(), 200)
+  },
+
+  preventNoticeModalMove() {},
 
   onModalChooseAvatar(event) {
     const { avatarUrl } = event.detail || {}

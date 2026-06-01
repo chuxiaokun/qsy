@@ -9,13 +9,13 @@
     <view wx:if="{{activeTab === 'remove'}}" class="section page-section">
       <view class="brand-hero fade-down">
         <view class="brand-hero-copy">
-          <text class="brand-kicker">SUMMER TOOL</text>
+          <text class="brand-kicker">KUN' TOOL</text>
           <text class="title">去水印工具箱</text>
           <text class="subtitle">粘贴链接，解析预览，一键保存高清内容</text>
         </view>
         <view class="brand-mark-wrap shadow-glow">
           <view class="brand-tool-mark">
-            <view class="icon icon-droplets icon-brand-tool"></view>
+            <image class="brand-logo-img" src="/pages/index/logo.png" mode="aspectFit" />
           </view>
         </view>
       </view>
@@ -176,12 +176,12 @@
             <text>即将上线</text>
           </view>
           <text class="promo-title">会员尊享全部功能</text>
-          <text class="promo-desc">个人主体小程序暂不支持支付，会员功能筹备中</text>
+      
           <view class="promo-btn promo-btn-disabled">
             <text>敬请期待</text>
           </view>
         </view>
-        <view class="icon icon-star promo-star"></view>
+        <!-- <view class="icon icon-star promo-star"></view> -->
       </view>
 
       <view class="product-list">
@@ -290,6 +290,18 @@
       </view>
 
       <text class="version">{{appVersion}}</text>
+    </view>
+  </view>
+
+  <view wx:if="{{showNoticeModal && currentNotice}}" class="profile-modal-mask" catchtouchmove="preventNoticeModalMove">
+    <view class="notice-modal glass rounded-2xl shadow-soft">
+      <view class="notice-modal-header">
+        <text class="notice-modal-header-text">{{currentNotice.title}}</text>
+      </view>
+      <view class="notice-modal-body">
+        <text class="notice-modal-content" user-select>{{currentNotice.content}}</text>
+        <button class="notice-modal-btn gradient-bg shadow-soft" bindtap="onDismissNotice">知道了</button>
+      </view>
     </view>
   </view>
 
