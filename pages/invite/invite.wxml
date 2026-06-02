@@ -1,0 +1,24 @@
+<view class="subpage">
+  <view class="sub-bg"></view>
+  <view class="sub-main" style="padding-top: {{statusBarHeight}}px;">
+    <view class="sub-nav">
+      <view class="sub-nav-back" bindtap="goBack">
+        <view class="icon icon-back"></view>
+      </view>
+      <text class="sub-nav-title">邀请好友</text>
+      <text class="sub-nav-action" bindtap="goHome">首页</text>
+    </view>
+
+    <view class="glass rounded-2xl shadow-soft invite-card">
+      <text class="invite-title">分享给好友</text>
+      <text class="invite-desc">把去水印工具箱分享给朋友，一起高效保存高清内容</text>
+
+      <button class="primary-btn gradient-bg shadow-soft invite-btn" open-type="share">
+        立即分享
+      </button>
+
+      <text class="invite-tip">点击「立即分享」后可选择发送给好友或群聊</text>
+    </view>
+  </view>
+</view>
+

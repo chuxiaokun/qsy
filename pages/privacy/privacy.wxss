@@ -1,0 +1,38 @@
+@import "../../styles/subpage.wxss";
+
+.doc-card {
+  padding: 26rpx 24rpx;
+}
+
+.doc-title {
+  display: block;
+  color: #12324A;
+  font-size: 34rpx;
+  font-weight: 700;
+  margin-bottom: 18rpx;
+}
+
+.doc-h2 {
+  display: block;
+  margin-top: 20rpx;
+  margin-bottom: 12rpx;
+  color: #12324A;
+  font-size: 28rpx;
+  font-weight: 700;
+}
+
+.doc-p {
+  display: block;
+  color: #415B6E;
+  font-size: 26rpx;
+  line-height: 1.75;
+  margin-bottom: 12rpx;
+}
+
+.doc-meta {
+  display: block;
+  margin-top: 14rpx;
+  color: #5E7A8C;
+  font-size: 24rpx;
+}
+

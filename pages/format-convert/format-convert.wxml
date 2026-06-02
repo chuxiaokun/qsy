@@ -27,12 +27,29 @@
 
       <view wx:else>
         <text class="convert-title">视频转 GIF</text>
-        <text class="convert-desc">截取视频前 3 秒（最多 12 帧），生成 GIF 并保存到相册。建议时长不超过 10 秒的视频。</text>
+        <text class="convert-desc">可自定义截取时长与帧率；GIF 将保持原视频宽高比例与尺寸。</text>
+        <view class="gif-settings">
+          <view class="setting-row">
+            <text class="setting-label">截取时长</text>
+            <text class="setting-value">{{gifDuration}} 秒</text>
+          </view>
+          <slider min="1" max="6" step="1" value="{{gifDuration}}" bindchange="onGifDurationChange" activeColor="#0EA5E9" block-color="#0EA5E9" />
+
+          <view class="setting-row">
+            <text class="setting-label">帧率</text>
+            <text class="setting-value">{{gifFps}} fps</text>
+          </view>
+          <slider min="4" max="12" step="1" value="{{gifFps}}" bindchange="onGifFpsChange" activeColor="#0EA5E9" block-color="#0EA5E9" />
+          <text wx:if="{{selectedVideoDuration}}" class="setting-tip">本次视频时长约 {{selectedVideoDuration}} 秒，将按上方参数截取。</text>
+        </view>
         <view wx:if="{{gifPreviewPath}}" class="preview-wrap">
           <image class="preview-image" src="{{gifPreviewPath}}" mode="aspectFit" />
         </view>
         <button class="primary-btn gradient-bg shadow-soft {{isConverting ? 'is-disabled' : ''}}" bindtap="chooseVideo" disabled="{{isConverting}}">
           {{isConverting ? '转换中 ' + progress + '%' : '选择视频并转换'}}
+        </button>
+        <button wx:if="{{gifPreviewPath}}" class="primary-btn shadow-soft {{isConverting ? 'is-disabled' : ''}}" bindtap="saveGifToAlbum" disabled="{{isConverting}}">
+          保存到相册
         </button>
       </view>
 

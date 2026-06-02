@@ -1,0 +1,40 @@
+<view class="subpage">
+  <view class="sub-bg"></view>
+  <view class="sub-main" style="padding-top: {{statusBarHeight}}px;">
+    <view class="sub-nav">
+      <view class="sub-nav-back" bindtap="goBack">
+        <view class="icon icon-back"></view>
+      </view>
+      <text class="sub-nav-title">意见反馈</text>
+      <text class="sub-nav-action" bindtap="submit" style="opacity: {{submitting ? 0.5 : 1}};">提交</text>
+    </view>
+
+    <view class="glass rounded-2xl shadow-soft form-card">
+      <text class="form-label">反馈内容</text>
+      <textarea
+        class="form-textarea"
+        value="{{content}}"
+        placeholder="请输入问题描述、建议或需要改进的地方（最多 2000 字）"
+        maxlength="2000"
+        bindinput="onContentInput"
+      />
+
+      <view class="form-split"></view>
+
+      <text class="form-label">联系方式（可选）</text>
+      <input
+        class="form-input"
+        value="{{contact}}"
+        placeholder="微信号/手机号/邮箱，方便我们联系你"
+        maxlength="128"
+        bindinput="onContactInput"
+      />
+
+      <button class="primary-btn gradient-bg shadow-soft form-btn" bindtap="submit" loading="{{submitting}}" disabled="{{submitting}}">
+        {{submitting ? '提交中...' : '提交反馈'}}
+      </button>
+      <text class="form-tip">我们会在后台查看并处理你的反馈，感谢支持</text>
+    </view>
+  </view>
+</view>
+

@@ -112,6 +112,9 @@
               <button class="result-btn gradient-bg shadow-soft {{isSavingVideo ? 'is-disabled' : ''}}" bindtap="saveVideo" disabled="{{isSavingVideo}}">
                 {{isSavingVideo ? '保存中...' : '保存到相册'}}
               </button>
+              <button class="result-btn result-btn-outline" bindtap="toggleFavorite">
+                {{isFavorited ? '已收藏' : '收藏'}}
+              </button>
               <button wx:if="{{hasLivePhoto}}" class="result-btn result-btn-outline {{isSavingLive ? 'is-disabled' : ''}}" bindtap="saveLivePhotos" disabled="{{isSavingLive}}">
                 {{isSavingLive ? '保存中...' : '保存 Live Photo'}}
               </button>
@@ -203,6 +206,9 @@
       </view>
 
       <text class="bottom-note">更多工具持续上线中...</text>
+      <ad-custom unit-id="adunit-80bfa2206fc320fc" bindload="adLoad" binderror="adError" bindclose="adClose"></ad-custom>
+      <br/>
+      <br/>
     </view>
 
     <view wx:else class="section page-section profile-section">
@@ -266,23 +272,47 @@
       </view>
 
       <view class="glass rounded-2xl menu-card shadow-soft">
-        <view class="menu-item {{index < menuItems.length - 1 ? 'has-border' : ''}}" wx:for="{{menuItems}}" wx:key="id" data-id="{{item.id}}" bindtap="onMenuTap">
-          <view class="menu-icon-box">
-            <view class="icon {{item.iconClass}} icon-primary icon-menu"></view>
+        <block wx:for="{{menuItems}}" wx:key="id">
+          <button
+            wx:if="{{item.id === 'invite'}}"
+            class="menu-item menu-item-btn {{index < menuItems.length - 1 ? 'has-border' : ''}}"
+            open-type="share"
+          >
+            <view class="menu-icon-box">
+              <view class="icon {{item.iconClass}} icon-primary icon-menu"></view>
+            </view>
+            <view class="menu-copy">
+              <text class="menu-title">{{item.name}}</text>
+              <text class="menu-desc">{{item.description}}</text>
+            </view>
+            <view class="menu-right">
+              <text wx:if="{{item.badge}}" class="badge {{item.badgeClass}}">{{item.badge}}</text>
+              <view class="icon icon-chevron-right icon-muted icon-small"></view>
+            </view>
+          </button>
+          <view
+            wx:else
+            class="menu-item {{index < menuItems.length - 1 ? 'has-border' : ''}}"
+            data-id="{{item.id}}"
+            bindtap="onMenuTap"
+          >
+            <view class="menu-icon-box">
+              <view class="icon {{item.iconClass}} icon-primary icon-menu"></view>
+            </view>
+            <view class="menu-copy">
+              <text class="menu-title">{{item.name}}</text>
+              <text class="menu-desc">{{item.description}}</text>
+            </view>
+            <view class="menu-right">
+              <text wx:if="{{item.badge}}" class="badge {{item.badgeClass}}">{{item.badge}}</text>
+              <view class="icon icon-chevron-right icon-muted icon-small"></view>
+            </view>
           </view>
-          <view class="menu-copy">
-            <text class="menu-title">{{item.name}}</text>
-            <text class="menu-desc">{{item.description}}</text>
-          </view>
-          <view class="menu-right">
-            <text wx:if="{{item.badge}}" class="badge {{item.badgeClass}}">{{item.badge}}</text>
-            <view class="icon icon-chevron-right icon-muted icon-small"></view>
-          </view>
-        </view>
+        </block>
       </view>
 
       <view class="glass rounded-2xl menu-card shadow-soft settings-card">
-        <view class="setting-item {{index < settingsItems.length - 1 ? 'has-border' : ''}}" wx:for="{{settingsItems}}" wx:key="id">
+        <view class="setting-item {{index < settingsItems.length - 1 ? 'has-border' : ''}}" wx:for="{{settingsItems}}" wx:key="id" data-id="{{item.id}}" bindtap="onSettingTap">
           <view class="icon {{item.iconClass}} icon-muted icon-setting"></view>
           <text class="setting-title">{{item.name}}</text>
           <view class="icon icon-chevron-right icon-muted icon-small"></view>

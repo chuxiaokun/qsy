@@ -3,8 +3,15 @@
     "pages/index/index",
     "pages/history/history",
     "pages/history-detail/history-detail",
+    "pages/favorites/favorites",
+    "pages/notifications/notifications",
+    "pages/invite/invite",
+    "pages/feedback/feedback",
     "pages/live-photo/live-photo",
     "pages/format-convert/format-convert",
+    "pages/image-compress/image-compress",
+    "pages/privacy/privacy",
+    "pages/terms/terms",
     "pages/bind-email/bind-email"
   ],
   "window": {

@@ -1,0 +1,30 @@
+@import "../../styles/subpage.wxss";
+
+.invite-card {
+  padding: 28rpx 24rpx;
+}
+
+.invite-title {
+  font-size: 34rpx;
+  font-weight: 800;
+  color: #0F172A;
+}
+
+.invite-desc {
+  margin-top: 10rpx;
+  font-size: 26rpx;
+  color: rgba(15, 23, 42, 0.7);
+  line-height: 1.5;
+}
+
+.invite-btn {
+  margin-top: 24rpx;
+}
+
+.invite-tip {
+  display: block;
+  margin-top: 14rpx;
+  font-size: 24rpx;
+  color: rgba(15, 23, 42, 0.55);
+}
+

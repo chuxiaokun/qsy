@@ -1,0 +1,50 @@
+<view class="subpage">
+  <view class="sub-bg"></view>
+  <view class="sub-main" style="padding-top: {{statusBarHeight}}px;">
+    <view class="sub-nav">
+      <view class="sub-nav-back" bindtap="goBack">
+        <view class="icon icon-back"></view>
+      </view>
+      <text class="sub-nav-title">消息通知</text>
+      <text class="sub-nav-action" bindtap="refresh">刷新</text>
+    </view>
+
+    <view wx:if="{{loading}}" class="glass rounded-2xl shadow-soft empty-wrap">
+      <text class="empty-desc">加载中…</text>
+    </view>
+
+    <view wx:elif="{{!list.length}}" class="glass rounded-2xl shadow-soft empty-wrap">
+      <text class="empty-title">暂无通知</text>
+      <text class="empty-desc">系统公告会在这里展示</text>
+    </view>
+
+    <view wx:else class="notice-list">
+      <view
+        class="glass rounded-2xl shadow-soft notice-item {{item.read ? 'is-read' : ''}}"
+        wx:for="{{list}}"
+        wx:key="id"
+        data-id="{{item.id}}"
+        bindtap="openNotice"
+      >
+        <view class="notice-head">
+          <text class="notice-title">{{item.title}}</text>
+          <text wx:if="{{!item.read}}" class="badge badge-hot">未读</text>
+        </view>
+        <text class="notice-content">{{item.content}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{showModal && current}}" class="profile-modal-mask" catchtouchmove="preventMove">
+    <view class="notice-modal glass rounded-2xl shadow-soft">
+      <view class="notice-modal-header">
+        <text class="notice-modal-header-text">{{current.title}}</text>
+      </view>
+      <view class="notice-modal-body">
+        <text class="notice-modal-content" user-select>{{current.content}}</text>
+        <button class="notice-modal-btn gradient-bg shadow-soft" bindtap="closeModal">知道了</button>
+      </view>
+    </view>
+  </view>
+</view>
+

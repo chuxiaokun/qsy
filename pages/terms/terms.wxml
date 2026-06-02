@@ -1,0 +1,17 @@
+<view class="subpage">
+  <view class="sub-bg"></view>
+  <view class="sub-main" style="padding-top: {{statusBarHeight}}px;">
+    <view class="sub-nav">
+      <view class="sub-nav-back" bindtap="goBack">
+        <view class="icon icon-back"></view>
+      </view>
+      <text class="sub-nav-title">用户协议</text>
+    </view>
+
+    <view class="glass rounded-2xl shadow-soft card-block doc-card">
+      <text class="doc-title" user-select>用户协议</text>
+      <text class="doc-p" user-select>（待补充）</text>
+    </view>
+  </view>
+</view>
+

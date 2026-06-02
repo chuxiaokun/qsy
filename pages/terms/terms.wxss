@@ -1,0 +1,22 @@
+@import "../../styles/subpage.wxss";
+
+.doc-card {
+  padding: 26rpx 24rpx;
+}
+
+.doc-title {
+  display: block;
+  color: #12324A;
+  font-size: 34rpx;
+  font-weight: 700;
+  margin-bottom: 18rpx;
+}
+
+.doc-p {
+  display: block;
+  color: #415B6E;
+  font-size: 26rpx;
+  line-height: 1.75;
+  margin-bottom: 12rpx;
+}
+

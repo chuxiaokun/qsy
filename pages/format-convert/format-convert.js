@@ -1,8 +1,15 @@
 const media = require("../../utils/media")
-const { encodeGif } = require("../../utils/gif")
+const { API_BASE } = require("../../utils/config")
 
-const MAX_GIF_FRAMES = 12
-const MAX_GIF_DURATION = 3
+const MAX_GIF_DURATION = 6
+const MIN_GIF_DURATION = 1
+const DEFAULT_GIF_DURATION = 3
+const MIN_GIF_FPS = 4
+const MAX_GIF_FPS = 12
+const DEFAULT_GIF_FPS = 8
+function apiBase() {
+  return String(API_BASE || "").trim().replace(/\/$/, "")
+}
 
 Page({
   data: {
@@ -15,7 +22,10 @@ Page({
     isConverting: false,
     showProgress: false,
     progress: 0,
-    progressLabel: ""
+    progressLabel: "",
+    selectedVideoDuration: 0,
+    gifDuration: DEFAULT_GIF_DURATION,
+    gifFps: DEFAULT_GIF_FPS
   },
 
   onLoad() {
@@ -29,6 +39,20 @@ Page({
 
   switchMode(event) {
     this.setData({ mode: event.currentTarget.dataset.mode })
+  },
+
+  onGifDurationChange(event) {
+    const value = Number(event.detail.value) || DEFAULT_GIF_DURATION
+    this.setData({
+      gifDuration: Math.max(MIN_GIF_DURATION, Math.min(MAX_GIF_DURATION, value))
+    })
+  },
+
+  onGifFpsChange(event) {
+    const value = Number(event.detail.value) || DEFAULT_GIF_FPS
+    this.setData({
+      gifFps: Math.max(MIN_GIF_FPS, Math.min(MAX_GIF_FPS, value))
+    })
   },
 
   chooseHeic() {
@@ -127,12 +151,8 @@ Page({
 
   chooseVideo() {
     if (this.data.isConverting) return
-    if (!wx.createVideoDecoder) {
-      wx.showModal({
-        title: "版本过低",
-        content: "视频转 GIF 需要较新的微信版本，请升级后重试",
-        showCancel: false
-      })
+    if (!apiBase()) {
+      wx.showToast({ title: "未配置 API_BASE", icon: "none" })
       return
     }
     wx.chooseMedia({
@@ -142,7 +162,11 @@ Page({
       success: (res) => {
         const file = res.tempFiles && res.tempFiles[0]
         if (!file) return
-        this.convertVideoToGif(file.tempFilePath, file.duration || MAX_GIF_DURATION)
+        const rawDuration = Number(file.duration) || MAX_GIF_DURATION
+        this.setData({
+          selectedVideoDuration: rawDuration
+        })
+        this.convertVideoToGif(file.tempFilePath, rawDuration)
       }
     })
   },
@@ -152,97 +176,88 @@ Page({
       isConverting: true,
       showProgress: true,
       progress: 5,
-      progressLabel: "正在解析视频帧"
+      progressLabel: "正在上传视频"
     })
 
     try {
-      const frames = await this.extractVideoFrames(
-        videoPath,
-        Math.min(durationSec, MAX_GIF_DURATION)
-      )
-      if (!frames.length) throw new Error("no frames")
-      this.setData({ progress: 75, progressLabel: "正在生成 GIF" })
-      const width = frames[0].width
-      const height = frames[0].height
-      const rgbaFrames = frames.map((item) => item.data)
-      const buffer = encodeGif(rgbaFrames, width, height, 8)
-      const filePath = `${wx.env.USER_DATA_PATH}/converted_${Date.now()}.gif`
-      await this.writeBufferFile(filePath, buffer)
-      this.setData({ gifPreviewPath: filePath, progress: 92 })
-      media.withPhotosAlbumAuth(() => {
-        media
-          .saveImageFile(filePath)
-          .then(() => {
-            wx.showToast({ title: "GIF 已保存到相册", icon: "success" })
-          })
-          .catch(() => {
-            wx.showToast({ title: "保存失败", icon: "none" })
-          })
-          .finally(() => this.resetProgress())
+      const actualDuration = Math.max(MIN_GIF_DURATION, Number(durationSec) || MAX_GIF_DURATION)
+      const plannedDuration = Math.min(this.data.gifDuration, actualDuration)
+      const gifUrl = await this.uploadVideoAndConvert(videoPath, {
+        durationSec: plannedDuration,
+        fps: this.data.gifFps
       })
+      this.setData({ progress: 78, progressLabel: "正在下载 GIF" })
+      const filePath = await media.downloadFile(gifUrl)
+      this.setData({ gifPreviewPath: filePath, progress: 100, progressLabel: "GIF 已生成" })
+      wx.showToast({ title: "已生成 GIF，点击下方按钮保存", icon: "none" })
+      this.resetProgress()
     } catch (err) {
-      wx.showToast({ title: "转换失败，请换短视频重试", icon: "none" })
+      const message = err && err.message ? err.message : "转换失败，请稍后重试"
+      wx.showToast({ title: message, icon: "none" })
       this.resetProgress()
     }
   },
 
-  writeBufferFile(filePath, buffer) {
-    return new Promise((resolve, reject) => {
-      wx.getFileSystemManager().writeFile({
-        filePath,
-        data: buffer,
-        success: resolve,
-        fail: reject
-      })
+  saveGifToAlbum() {
+    const filePath = this.data.gifPreviewPath
+    if (!filePath) return
+    if (this.data.isConverting) return
+    this.setData({
+      isConverting: true,
+      showProgress: true,
+      progress: 10,
+      progressLabel: "正在保存到相册"
+    })
+    media.withPhotosAlbumAuth(() => {
+      media
+        .saveImageFile(filePath)
+        .then(() => {
+          wx.showToast({ title: "已保存到相册", icon: "success" })
+        })
+        .catch(() => {
+          wx.showToast({ title: "保存失败", icon: "none" })
+        })
+        .finally(() => this.resetProgress())
     })
   },
 
-  extractVideoFrames(videoPath, durationSec) {
+  uploadVideoAndConvert(videoPath, options) {
     return new Promise((resolve, reject) => {
-      const decoder = wx.createVideoDecoder()
-      const frames = []
-      const frameCount = Math.min(
-        MAX_GIF_FRAMES,
-        Math.max(4, Math.round(durationSec * 4))
-      )
-      const interval = (durationSec * 1000) / frameCount
-      let index = 0
-
-      const captureNext = () => {
-        if (index >= frameCount) {
-          decoder.stop()
-          if (!frames.length) reject(new Error("empty"))
-          else resolve(frames)
-          return
+      const base = apiBase()
+      const task = wx.uploadFile({
+        url: `${base}/api/tools/video-to-gif`,
+        filePath: videoPath,
+        name: "video",
+        timeout: 120000,
+        formData: {
+          durationSec: String(options.durationSec),
+          fps: String(options.fps)
+        },
+        success: (res) => {
+          let body = {}
+          try {
+            body = typeof res.data === "string" ? JSON.parse(res.data) : res.data || {}
+          } catch (e) {
+            reject(new Error("服务返回异常"))
+            return
+          }
+          if (res.statusCode >= 200 && res.statusCode < 300 && body.code === 200 && body.data && body.data.gifUrl) {
+            resolve(body.data.gifUrl)
+            return
+          }
+          reject(new Error(body.msg || `转换失败(${res.statusCode})`))
+        },
+        fail: (err) => {
+          reject(new Error((err && err.errMsg) || "网络异常"))
         }
-        decoder.seek(index * interval)
-        setTimeout(() => {
-          decoder.getFrameData({
-            success: (frame) => {
-              if (frame && frame.data) {
-                frames.push({
-                  width: frame.width,
-                  height: frame.height,
-                  data: new Uint8Array(frame.data)
-                })
-                this.setData({
-                  progress: Math.min(10 + Math.round((index / frameCount) * 60), 70)
-                })
-              }
-              index += 1
-              captureNext()
-            },
-            fail: () => {
-              index += 1
-              captureNext()
-            }
+      })
+      if (task && task.onProgressUpdate) {
+        task.onProgressUpdate(({ progress = 0 }) => {
+          this.setData({
+            progress: Math.min(10 + Math.round(progress * 0.6), 70)
           })
-        }, 150)
+        })
       }
-
-      decoder.on("start", () => captureNext())
-      decoder.on("error", reject)
-      decoder.start({ source: videoPath, mode: 0 })
     })
   },
 

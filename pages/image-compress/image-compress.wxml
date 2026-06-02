@@ -1,0 +1,57 @@
+<view class="subpage">
+  <view class="sub-bg"></view>
+  <view class="sub-main" style="padding-top: {{statusBarHeight}}px;">
+    <view class="sub-nav">
+      <view class="sub-nav-back" bindtap="goBack">
+        <view class="icon icon-back"></view>
+      </view>
+      <text class="sub-nav-title">图片压缩</text>
+    </view>
+
+    <view class="glass rounded-2xl shadow-soft card-block convert-card">
+      <text class="convert-title">压缩并导出 JPG</text>
+      <text class="convert-desc">可调质量与最长边，保持原图比例。生成后手动保存到相册。</text>
+
+      <view class="settings">
+        <view class="setting-row">
+          <text class="setting-label">压缩质量</text>
+          <text class="setting-value">{{compressQuality}}%</text>
+        </view>
+        <slider min="30" max="95" step="1" value="{{compressQuality}}" bindchange="onCompressQualityChange" activeColor="#0EA5E9" block-color="#0EA5E9" />
+
+        <view class="setting-row">
+          <text class="setting-label">最长边</text>
+          <picker mode="selector" range="{{compressMaxSideOptions}}" value="{{compressMaxSideIndex}}" bindchange="onCompressMaxSideChange">
+            <view class="picker-value">{{compressMaxSideOptions[compressMaxSideIndex]}} px</view>
+          </picker>
+        </view>
+        <text class="setting-tip">若原图小于最长边则不缩放。</text>
+      </view>
+
+      <view wx:if="{{compressPreviewPath}}" class="preview-wrap">
+        <image class="preview-image" src="{{compressPreviewPath}}" mode="aspectFit" />
+      </view>
+
+      <button class="primary-btn gradient-bg shadow-soft {{isConverting ? 'is-disabled' : ''}}" bindtap="chooseCompressImage" disabled="{{isConverting}}">
+        {{isConverting ? '压缩中 ' + progress + '%' : (compressPreviewPath ? '重新选择并压缩' : '选择图片并压缩')}}
+      </button>
+
+      <button wx:if="{{compressPreviewPath}}" class="primary-btn shadow-soft {{isConverting ? 'is-disabled' : ''}}" bindtap="saveCompressedToAlbum" disabled="{{isConverting}}">
+        保存到相册
+      </button>
+
+      <view wx:if="{{showProgress}}" class="progress-wrap">
+        <view class="progress-head">
+          <text>{{progressLabel}}</text>
+          <text>{{progress}}%</text>
+        </view>
+        <view class="progress-track">
+          <view class="progress-bar" style="width: {{progress}}%;"></view>
+        </view>
+      </view>
+    </view>
+
+    <canvas type="2d" id="compressCanvas" class="hidden-canvas" style="width: {{canvasWidth}}px; height: {{canvasHeight}}px;"></canvas>
+  </view>
+</view>
+

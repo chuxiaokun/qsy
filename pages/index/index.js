@@ -7,6 +7,7 @@ const unlockGate = require("../../utils/unlock-gate")
 const { getVersionLabel } = require("../../utils/version")
 const appVersionApi = require("../../utils/app-version")
 const appNotifications = require("../../utils/notifications")
+const favoritesStore = require("../../utils/favorites")
 
 const platforms = [
   { id: "douyin", name: "抖音", dotClass: "dot-pink" },
@@ -44,23 +45,24 @@ const products = [
     description: "无损压缩图片，减少文件大小",
     iconClass: "icon-image",
     colorClass: "product-violet",
-    bgClass: "product-bg-violet"
+    bgClass: "product-bg-violet",
+    page: "/pages/image-compress/image-compress"
   }
 ]
 
 const menuItems = [
   { id: "history", name: "处理记录", iconClass: "icon-history", description: "查看历史记录" },
-  { id: "favorites", name: "我的收藏", iconClass: "icon-star", description: "收藏的内容", badge: "3", badgeClass: "badge-primary" },
-  { id: "notifications", name: "消息通知", iconClass: "icon-bell", description: "系统消息", badge: "2", badgeClass: "badge-hot" },
+  { id: "favorites", name: "我的收藏", iconClass: "icon-star", description: "收藏的内容", badge: "", badgeClass: "badge-primary" },
+  { id: "notifications", name: "消息通知", iconClass: "icon-bell", description: "系统消息", badge: "", badgeClass: "badge-hot" },
   { id: "invite", name: "邀请好友", iconClass: "icon-gift", description: "分享给好友" }
 ]
 
 const settingsItems = [
-  { id: "settings", name: "设置", iconClass: "icon-settings" },
-  { id: "help", name: "帮助中心", iconClass: "icon-help" },
+  // { id: "settings", name: "设置", iconClass: "icon-settings" },
+  // { id: "help", name: "帮助中心", iconClass: "icon-help" },
   { id: "feedback", name: "意见反馈", iconClass: "icon-message" },
   { id: "privacy", name: "隐私政策", iconClass: "icon-shield" },
-  { id: "terms", name: "用户协议", iconClass: "icon-file" }
+  // { id: "terms", name: "用户协议", iconClass: "icon-file" }
 ]
 
 Page({
@@ -78,6 +80,7 @@ Page({
     images: [],
     imageCurrent: 0,
     hasLivePhoto: false,
+    isFavorited: false,
     isSavingLive: false,
     platforms,
     products,
@@ -125,6 +128,9 @@ Page({
     })
     if (this.data.activeTab === "remove") {
       this.loadAndShowNotificationsOnce()
+    }
+    if (this.data.activeTab === "profile") {
+      this.refreshMenuBadges()
     }
   },
 
@@ -174,7 +180,27 @@ Page({
     historyStore.getCount().then((count) => {
       this.setData({ usageCount: count })
     })
+    this.refreshMenuBadges()
     this.maybeShowProfileModal(auth.getUser() || user)
+  },
+
+  refreshMenuBadges() {
+    Promise.all([
+      favoritesStore.getCount().catch(() => 0),
+      appNotifications.fetchActiveWithRead().catch(() => ({ unreadCount: 0 }))
+    ]).then(([favCount, notice]) => {
+      const unread = Number(notice.unreadCount) || 0
+      const next = (this.data.menuItems || []).map((item) => {
+        if (item.id === "favorites") {
+          return { ...item, badge: favCount ? String(favCount) : "" }
+        }
+        if (item.id === "notifications") {
+          return { ...item, badge: unread ? String(unread) : "" }
+        }
+        return item
+      })
+      this.setData({ menuItems: next })
+    })
   },
 
   maybeShowProfileModal(user) {
@@ -320,6 +346,34 @@ Page({
     const { id } = event.currentTarget.dataset
     if (id === "history") {
       wx.navigateTo({ url: "/pages/history/history" })
+      return
+    }
+    if (id === "favorites") {
+      wx.navigateTo({ url: "/pages/favorites/favorites" })
+      return
+    }
+    if (id === "notifications") {
+      wx.navigateTo({ url: "/pages/notifications/notifications" })
+      return
+    }
+    if (id === "invite") {
+      wx.navigateTo({ url: "/pages/invite/invite" })
+    }
+  },
+
+  onSettingTap(event) {
+    const { id } = event.currentTarget.dataset
+    if (id === "privacy") {
+      wx.navigateTo({ url: "/pages/privacy/privacy" })
+      return
+    }
+    if (id === "terms") {
+      wx.navigateTo({ url: "/pages/terms/terms" })
+      return
+    }
+    if (id === "feedback") {
+      wx.navigateTo({ url: "/pages/feedback/feedback" })
+      return
     }
   },
 
@@ -360,7 +414,8 @@ Page({
       parseResult: null,
       images: [],
       imageCurrent: 0,
-      hasLivePhoto: false
+      hasLivePhoto: false,
+      isFavorited: false
     })
   },
 
@@ -421,13 +476,15 @@ Page({
                   parseResult,
                   images,
                   imageCurrent: 0,
-                  hasLivePhoto
+                  hasLivePhoto,
+                  isFavorited: favoritesStore.existsLocal(link)
                 })
                 if (this.data.activeTab === "profile") {
                   historyStore.getCount().then((count) => {
                     this.setData({ usageCount: count })
                   })
                 }
+                this.refreshMenuBadges()
               })
             return
           }
@@ -448,6 +505,49 @@ Page({
     }
 
     unlockGate.requestUnlock(this, runParse)
+  },
+
+  toggleFavorite() {
+    if (!this.data.showParseResult) return
+    const sourceUrl = (this.data.linkInput || "").trim()
+    const title = this.data.parseResult?.title || ""
+    const videoUrl = this.data.parseResult?.videoUrl || ""
+    const images = this.data.images || []
+
+    if (!sourceUrl) return
+
+    if (this.data.isFavorited) {
+      const existing = (favoritesStore.getLocalList() || []).find(
+        (it) => String(it.sourceUrl || it.source_url || "").trim() === sourceUrl
+      )
+      if (!existing) {
+        this.setData({ isFavorited: false })
+        this.refreshMenuBadges()
+        return
+      }
+      favoritesStore
+        .removeFavorite(existing)
+        .then(() => {
+          this.setData({ isFavorited: false })
+          this.refreshMenuBadges()
+          wx.showToast({ title: "已取消收藏", icon: "success" })
+        })
+        .catch(() => {
+          wx.showToast({ title: "取消失败", icon: "none" })
+        })
+      return
+    }
+
+    favoritesStore
+      .addFavorite({ sourceUrl, title, videoUrl, images })
+      .then(() => {
+        this.setData({ isFavorited: true })
+        this.refreshMenuBadges()
+        wx.showToast({ title: "已收藏", icon: "success" })
+      })
+      .catch((err) => {
+        wx.showToast({ title: (err && err.message) || "收藏失败", icon: "none" })
+      })
   },
 
   copyTitle() {
@@ -547,5 +647,12 @@ Page({
     }
 
     unlockGate.requestUnlock(this, doSave)
+  },
+
+  onShareAppMessage() {
+    return {
+      title: "去水印工具箱：解析预览，一键保存高清内容",
+      path: "/pages/index/index"
+    }
   }
 })
