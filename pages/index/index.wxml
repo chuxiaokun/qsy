@@ -220,7 +220,7 @@
               <text class="avatar-text">{{userInitial}}</text>
             </view>
             <view wx:if="{{isVip}}" class="vip-crown-badge">
-              <view class="icon icon-crown vip-crown-icon"></view>
+              <image class="profile-vip-crown-img" src="/assets/icons/lucide/crown-amber.png" mode="aspectFit" />
             </view>
           </view>
           <view class="user-info">
@@ -237,19 +237,19 @@
       <view class="glass rounded-2xl menu-card shadow-soft profile-action-card">
         <view class="menu-item" bindtap="goBindEmail">
           <view class="menu-icon-box">
-            <view class="icon icon-mail icon-primary icon-menu"></view>
+            <image class="profile-icon-img" src="/assets/icons/lucide/mail.png" mode="aspectFit" />
           </view>
           <view class="menu-copy">
             <text class="menu-title">绑定邮箱</text>
             <text class="menu-desc">{{emailBound ? '已绑定，点击查看' : '绑定后可接收通知与找回账号'}}</text>
           </view>
-          <view class="icon icon-chevron-right icon-muted icon-small"></view>
+          <image class="menu-chevron" src="/assets/icons/lucide/chevron-right-muted.png" mode="aspectFit" />
         </view>
       </view>
 
       <view class="glass rounded-2xl member-soon-card shadow-soft" bindtap="onComingSoon">
         <view class="member-soon-head">
-          <view class="icon icon-crown icon-amber icon-small"></view>
+          <image class="member-crown-img" src="/assets/icons/lucide/crown-amber.png" mode="aspectFit" />
           <text class="member-soon-title">{{isVip ? 'VIP 会员' : '开通 VIP'}}</text>
           <text class="member-soon-tag">{{isVip ? '已开通' : '联系客服'}}</text>
         </view>
@@ -279,7 +279,7 @@
             open-type="share"
           >
             <view class="menu-icon-box">
-              <view class="icon {{item.iconClass}} icon-primary icon-menu"></view>
+              <image class="profile-icon-img" src="{{item.iconSrc}}" mode="aspectFit" />
             </view>
             <view class="menu-copy">
               <text class="menu-title">{{item.name}}</text>
@@ -287,7 +287,7 @@
             </view>
             <view class="menu-right">
               <text wx:if="{{item.badge}}" class="badge {{item.badgeClass}}">{{item.badge}}</text>
-              <view class="icon icon-chevron-right icon-muted icon-small"></view>
+              <image class="menu-chevron" src="/assets/icons/lucide/chevron-right-muted.png" mode="aspectFit" />
             </view>
           </button>
           <view
@@ -297,7 +297,7 @@
             bindtap="onMenuTap"
           >
             <view class="menu-icon-box">
-              <view class="icon {{item.iconClass}} icon-primary icon-menu"></view>
+              <image class="profile-icon-img" src="{{item.iconSrc}}" mode="aspectFit" />
             </view>
             <view class="menu-copy">
               <text class="menu-title">{{item.name}}</text>
@@ -305,7 +305,7 @@
             </view>
             <view class="menu-right">
               <text wx:if="{{item.badge}}" class="badge {{item.badgeClass}}">{{item.badge}}</text>
-              <view class="icon icon-chevron-right icon-muted icon-small"></view>
+              <image class="menu-chevron" src="/assets/icons/lucide/chevron-right-muted.png" mode="aspectFit" />
             </view>
           </view>
         </block>
@@ -313,13 +313,16 @@
 
       <view class="glass rounded-2xl menu-card shadow-soft settings-card">
         <view class="setting-item {{index < settingsItems.length - 1 ? 'has-border' : ''}}" wx:for="{{settingsItems}}" wx:key="id" data-id="{{item.id}}" bindtap="onSettingTap">
-          <view class="icon {{item.iconClass}} icon-muted icon-setting"></view>
+          <image class="setting-icon-img" src="{{item.iconSrc}}" mode="aspectFit" />
           <text class="setting-title">{{item.name}}</text>
-          <view class="icon icon-chevron-right icon-muted icon-small"></view>
+          <image class="menu-chevron" src="/assets/icons/lucide/chevron-right-muted.png" mode="aspectFit" />
         </view>
       </view>
 
       <text class="version">{{appVersion}}</text>
+      <view class="profile-ad-wrap">
+        <ad-custom unit-id="adunit-dcee7d81b59808ef" bindload="adLoad" binderror="adError" bindclose="adClose"></ad-custom>
+      </view>
     </view>
   </view>
 

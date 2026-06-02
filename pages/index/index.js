@@ -9,6 +9,8 @@ const appVersionApi = require("../../utils/app-version")
 const appNotifications = require("../../utils/notifications")
 const favoritesStore = require("../../utils/favorites")
 
+const ICON_BASE = "/assets/icons/lucide"
+
 const platforms = [
   { id: "douyin", name: "抖音", dotClass: "dot-pink" },
   { id: "kuaishou", name: "快手", dotClass: "dot-orange" },
@@ -51,18 +53,15 @@ const products = [
 ]
 
 const menuItems = [
-  { id: "history", name: "处理记录", iconClass: "icon-history", description: "查看历史记录" },
-  { id: "favorites", name: "我的收藏", iconClass: "icon-star", description: "收藏的内容", badge: "", badgeClass: "badge-primary" },
-  { id: "notifications", name: "消息通知", iconClass: "icon-bell", description: "系统消息", badge: "", badgeClass: "badge-hot" },
-  { id: "invite", name: "邀请好友", iconClass: "icon-gift", description: "分享给好友" }
+  { id: "history", name: "处理记录", iconSrc: `${ICON_BASE}/history.png`, description: "查看历史记录" },
+  { id: "favorites", name: "我的收藏", iconSrc: `${ICON_BASE}/star.png`, description: "收藏的内容", badge: "", badgeClass: "badge-primary" },
+  { id: "notifications", name: "消息通知", iconSrc: `${ICON_BASE}/bell.png`, description: "系统消息", badge: "", badgeClass: "badge-hot" },
+  // { id: "invite", name: "邀请好友", iconSrc: `${ICON_BASE}/gift.png`, description: "分享给好友" }
 ]
 
 const settingsItems = [
-  // { id: "settings", name: "设置", iconClass: "icon-settings" },
-  // { id: "help", name: "帮助中心", iconClass: "icon-help" },
-  { id: "feedback", name: "意见反馈", iconClass: "icon-message" },
-  { id: "privacy", name: "隐私政策", iconClass: "icon-shield" },
-  // { id: "terms", name: "用户协议", iconClass: "icon-file" }
+  { id: "feedback", name: "意见反馈", iconSrc: `${ICON_BASE}/message-square-muted.png` },
+  { id: "privacy", name: "隐私政策", iconSrc: `${ICON_BASE}/shield-check-muted.png` }
 ]
 
 Page({
@@ -117,6 +116,14 @@ Page({
       if (label) this.setData({ appVersion: label })
     })
   },
+
+  adLoad() {},
+
+  adError(event) {
+    console.warn("ad-custom error", event && event.detail ? event.detail : event)
+  },
+
+  adClose() {},
 
   onShow() {
     if (this.data.activeTab === "profile") {
