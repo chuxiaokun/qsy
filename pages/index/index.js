@@ -239,10 +239,27 @@ Page({
   maybeShowProfileModal(user) {
     const u = user || auth.refreshUserFromStorage() || getApp().globalData.user
     if (!auth.needsProfileSetup(u)) return
+    this.openProfileModal(u)
+  },
+
+  isProfileIncomplete(user) {
+    const u = user || auth.refreshUserFromStorage() || getApp().globalData.user
+    if (!u || u.isLocal || !auth.apiReady()) return false
+    return !!(u.isGuest || !u.avatarUrl)
+  },
+
+  getProfileModalNickname(user) {
+    const nickname = (user && user.nickname ? String(user.nickname) : "").trim()
+    if (!nickname || /^用户\d{4}$/.test(nickname) || /^游客/.test(nickname)) return ""
+    return nickname
+  },
+
+  openProfileModal(user) {
+    const u = user || auth.refreshUserFromStorage() || getApp().globalData.user || {}
     this.setData({
       showProfileModal: true,
       modalAvatarUrl: "",
-      modalNickname: u.nickname && !/^用户\d{4}$/.test(u.nickname) ? u.nickname : ""
+      modalNickname: this.getProfileModalNickname(u)
     })
   },
 
@@ -250,6 +267,12 @@ Page({
     const tab = event.currentTarget.dataset.tab
     this.setData({ activeTab: tab })
     if (tab === "profile") this.refreshProfile()
+  },
+
+  onProfileIdentityTap() {
+    const user = auth.refreshUserFromStorage() || getApp().globalData.user
+    if (!this.isProfileIncomplete(user)) return
+    this.openProfileModal(user)
   },
 
   loadAndShowNotificationsOnce() {

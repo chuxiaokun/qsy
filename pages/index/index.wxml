@@ -247,7 +247,7 @@
 
     <view wx:else class="section page-section profile-section">
       <view class="glass rounded-3xl user-card shadow-soft fade-down">
-        <view class="user-row">
+        <view class="user-row" bindtap="onProfileIdentityTap">
           <view class="avatar-wrap">
             <image wx:if="{{user.avatarUrl}}" class="avatar avatar-img shadow-glow" src="{{user.avatarUrl}}" mode="aspectFill" />
             <view wx:else class="avatar gradient-bg shadow-glow">
