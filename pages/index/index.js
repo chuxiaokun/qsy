@@ -8,8 +8,10 @@ const { getVersionLabel } = require("../../utils/version")
 const appVersionApi = require("../../utils/app-version")
 const appNotifications = require("../../utils/notifications")
 const favoritesStore = require("../../utils/favorites")
+const config = require("../../utils/config")
 
 const ICON_BASE = "/assets/icons/lucide"
+const BRAND_ICON_BASE = "/assets/icons/brand"
 
 const platforms = [
   { id: "douyin", name: "抖音", dotClass: "dot-pink" },
@@ -52,6 +54,29 @@ const products = [
   }
 ]
 
+const redPackets = [
+  {
+    id: "meituan-waimai",
+    name: "领取美团外卖红包",
+    description: "点外卖前先领券",
+    tag: "外卖红包",
+    iconSrc: `${BRAND_ICON_BASE}/meituan.png`,
+    logoClass: "redpacket-logo-square",
+    themeClass: "redpacket-meituan",
+    target: config.RED_PACKET_ENTRANCES.MEITUAN_WAIMAI
+  },
+  {
+    id: "jd-waimai",
+    name: "领取京东外卖红包",
+    description: "品质外卖先领券",
+    tag: "京东外卖",
+    iconSrc: `${BRAND_ICON_BASE}/jd-waimai.png`,
+    logoClass: "redpacket-logo-wide",
+    themeClass: "redpacket-jd",
+    target: config.RED_PACKET_ENTRANCES.JD_WAIMAI
+  }
+]
+
 const menuItems = [
   { id: "history", name: "处理记录", iconSrc: `${ICON_BASE}/history.png`, description: "查看历史记录" },
   { id: "favorites", name: "我的收藏", iconSrc: `${ICON_BASE}/star.png`, description: "收藏的内容", badge: "", badgeClass: "badge-primary" },
@@ -83,6 +108,7 @@ Page({
     isSavingLive: false,
     platforms,
     products,
+    redPackets,
     menuItems,
     settingsItems,
     user: { nickname: "游客", isGuest: true },
@@ -387,6 +413,31 @@ Page({
   onProductTap(event) {
     const { page } = event.currentTarget.dataset
     if (page) wx.navigateTo({ url: page })
+  },
+
+  onRedPacketTap(event) {
+    const { id } = event.currentTarget.dataset
+    const packet = (this.data.redPackets || []).find((item) => item.id === id)
+    const target = packet && packet.target ? packet.target : {}
+
+    if (target.appId) {
+      wx.navigateToMiniProgram({
+        appId: target.appId,
+        path: target.path || "",
+        fail: () => wx.showToast({ title: "暂时无法打开活动", icon: "none" })
+      })
+      return
+    }
+
+    if (target.url) {
+      wx.setClipboardData({
+        data: target.url,
+        success: () => wx.showToast({ title: "活动链接已复制", icon: "success" })
+      })
+      return
+    }
+
+    wx.showToast({ title: "活动链接配置中", icon: "none" })
   },
 
   onLinkInput(event) {

@@ -675,6 +675,213 @@
   animation: wobble 3s ease-in-out infinite;
 }
 
+.redpacket-section {
+  margin-top: 36rpx;
+  margin-bottom: 36rpx;
+}
+
+.redpacket-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 18rpx;
+}
+
+.redpacket-eyebrow,
+.redpacket-headline {
+  display: block;
+}
+
+.redpacket-eyebrow {
+  color: #FF4D00;
+  font-size: 24rpx;
+  font-weight: 700;
+}
+
+.redpacket-headline {
+  margin-top: 4rpx;
+  color: #12324A;
+  font-size: 32rpx;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.redpacket-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18rpx;
+}
+
+.redpacket-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  min-width: 0;
+  min-height: 252rpx;
+  padding: 22rpx;
+  overflow: hidden;
+  text-align: left;
+  border-radius: 24rpx;
+  box-shadow: 0 16rpx 36rpx rgba(255, 91, 0, 0.22);
+}
+
+.redpacket-card::before {
+  position: absolute;
+  top: 0;
+  left: -40%;
+  width: 60%;
+  height: 100%;
+  content: "";
+  background: linear-gradient(105deg, transparent 0%, rgba(255, 255, 255, 0.36) 50%, transparent 100%);
+  transform: skewX(-18deg);
+}
+
+.redpacket-card-hover {
+  opacity: 0.9;
+  transform: translateY(2rpx);
+}
+
+.redpacket-card-head {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12rpx;
+  min-width: 0;
+  margin-bottom: 18rpx;
+}
+
+.redpacket-logo-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 118rpx;
+  height: 68rpx;
+  padding: 8rpx 12rpx;
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.94);
+  border-radius: 16rpx;
+}
+
+.redpacket-logo {
+  display: block;
+}
+
+.redpacket-logo-square {
+  width: 56rpx;
+  height: 56rpx;
+}
+
+.redpacket-logo-word {
+  width: 96rpx;
+  height: 40rpx;
+}
+
+.redpacket-logo-wide {
+  width: 96rpx;
+  height: 54rpx;
+}
+
+.redpacket-tag {
+  max-width: 128rpx;
+  padding: 8rpx 12rpx;
+  overflow: hidden;
+  font-size: 22rpx;
+  font-weight: 800;
+  line-height: 1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  border-radius: 999rpx;
+}
+
+.redpacket-copy {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  min-width: 0;
+}
+
+.redpacket-title,
+.redpacket-desc {
+  display: block;
+}
+
+.redpacket-title {
+  color: inherit;
+  font-size: 29rpx;
+  font-weight: 900;
+  line-height: 1.28;
+}
+
+.redpacket-desc {
+  margin-top: 8rpx;
+  font-size: 23rpx;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.redpacket-action {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6rpx;
+  height: 56rpx;
+  margin-top: 18rpx;
+  font-size: 24rpx;
+  font-weight: 900;
+  border-radius: 999rpx;
+}
+
+.redpacket-arrow {
+  width: 24rpx;
+  height: 24rpx;
+  transform: scale(0.62);
+}
+
+.redpacket-meituan {
+  color: #1F2600;
+  background: linear-gradient(135deg, #FFD900 0%, #FFC400 58%, #FF9100 100%);
+  border: 2rpx solid rgba(255, 196, 0, 0.72);
+}
+
+.redpacket-meituan .redpacket-tag {
+  color: #3B2A00;
+  background: rgba(255, 255, 255, 0.62);
+}
+
+.redpacket-meituan .redpacket-desc {
+  color: rgba(31, 38, 0, 0.7);
+}
+
+.redpacket-meituan .redpacket-action {
+  color: #12324A;
+  background: rgba(255, 255, 255, 0.74);
+}
+
+.redpacket-jd {
+  color: #fff;
+  background: linear-gradient(135deg, #FF5A4F 0%, #E2231A 52%, #B91C1C 100%);
+  border: 2rpx solid rgba(226, 35, 26, 0.72);
+}
+
+.redpacket-jd .redpacket-tag {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.redpacket-jd .redpacket-desc {
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.redpacket-jd .redpacket-action {
+  color: #D71920;
+  background: rgba(255, 255, 255, 0.92);
+}
+
 .product-list {
   display: flex;
   flex-direction: column;

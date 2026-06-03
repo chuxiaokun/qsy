@@ -19,6 +19,10 @@
     "backgroundColor": "#F0FAFF",
     "backgroundTextStyle": "dark"
   },
+  "navigateToMiniProgramAppIdList": [
+    "wxde8ac0a21135c07d",
+    "wx91d27dbf599dff74"
+  ],
   "style": "v2",
   "sitemapLocation": "sitemap.json"
 }

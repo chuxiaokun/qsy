@@ -207,6 +207,40 @@
 
       <text class="bottom-note">更多工具持续上线中...</text>
       <ad-custom unit-id="adunit-80bfa2206fc320fc" bindload="adLoad" binderror="adError" bindclose="adClose"></ad-custom>
+      <view class="redpacket-section fade-up">
+        <view class="redpacket-head">
+          <view>
+            <text class="redpacket-eyebrow">红包福利</text>
+            <text class="redpacket-headline">先领红包再下单</text>
+          </view>
+        </view>
+        <view class="redpacket-grid">
+          <button
+            class="redpacket-card {{item.themeClass}}"
+            hover-class="redpacket-card-hover"
+            hover-stay-time="80"
+            wx:for="{{redPackets}}"
+            wx:key="id"
+            data-id="{{item.id}}"
+            bindtap="onRedPacketTap"
+          >
+            <view class="redpacket-card-head">
+              <view class="redpacket-logo-wrap">
+                <image class="redpacket-logo {{item.logoClass}}" src="{{item.iconSrc}}" mode="aspectFit" />
+              </view>
+              <text class="redpacket-tag">{{item.tag}}</text>
+            </view>
+            <view class="redpacket-copy">
+              <text class="redpacket-title">{{item.name}}</text>
+              <text class="redpacket-desc">{{item.description}}</text>
+            </view>
+            <view class="redpacket-action">
+              <text>去领取</text>
+              <view class="icon icon-arrow-right redpacket-arrow"></view>
+            </view>
+          </button>
+        </view>
+      </view>
       <br/>
       <br/>
     </view>
