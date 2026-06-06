@@ -85,7 +85,7 @@ const menuItems = [
 ]
 
 const settingsItems = [
-  { id: "feedback", name: "意见反馈", iconSrc: `${ICON_BASE}/message-square-muted.png` },
+  // { id: "feedback", name: "意见反馈", iconSrc: `${ICON_BASE}/message-square-muted.png` },
   { id: "privacy", name: "隐私政策", iconSrc: `${ICON_BASE}/shield-check-muted.png` }
 ]
 
