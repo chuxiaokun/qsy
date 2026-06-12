@@ -1,4 +1,5 @@
 const auth = require("./auth")
+const mediaProxy = require("./mediaProxy")
 
 const STORAGE_KEY = "parse_history"
 const MAX_RECORDS = 50
@@ -191,7 +192,7 @@ async function clearAll() {
 
 function getListForDisplay(list) {
   const source = list || getLocalList()
-  return source.map((item) => normalizeRecord(item))
+  return source.map((item) => mediaProxy.withListItemPreviewUrls(normalizeRecord(item)))
 }
 
 function getLivePhotoItems(list) {
@@ -200,14 +201,16 @@ function getLivePhotoItems(list) {
   source.forEach((record) => {
     ;(record.images || []).forEach((image, index) => {
       if (image.livePhotoUrl) {
-        items.push({
-          id: `${record.id}_${index}`,
-          recordId: record.id,
-          title: record.title || `作品 ${index + 1}`,
-          url: image.url,
-          livePhotoUrl: image.livePhotoUrl,
-          timeLabel: formatTimeLabel(record.createdAt)
-        })
+        items.push(
+          mediaProxy.withLivePhotoItemPreviewUrls({
+            id: `${record.id}_${index}`,
+            recordId: record.id,
+            title: record.title || `作品 ${index + 1}`,
+            url: image.url,
+            livePhotoUrl: image.livePhotoUrl,
+            timeLabel: formatTimeLabel(record.createdAt)
+          })
+        )
       }
     })
   })

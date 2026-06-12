@@ -13,7 +13,7 @@
         <video
           wx:if="{{record.videoUrl}}"
           class="detail-video"
-          src="{{record.videoUrl}}"
+          src="{{record.previewVideoUrl}}"
           controls
           show-center-play-btn
           object-fit="contain"
@@ -29,7 +29,7 @@
             indicator-active-color="#38BDF8"
           >
             <swiper-item wx:for="{{record.images}}" wx:key="url">
-              <image class="detail-image" src="{{item.url}}" mode="aspectFit" bindtap="previewImages" />
+              <image class="detail-image" src="{{item.previewUrl}}" mode="aspectFit" bindtap="previewImages" />
             </swiper-item>
           </swiper>
         </view>

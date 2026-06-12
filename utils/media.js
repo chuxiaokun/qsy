@@ -1,3 +1,5 @@
+const { resolveProxiedMediaUrl } = require("./mediaProxy")
+
 function withPhotosAlbumAuth(callback) {
   wx.getSetting({
     success: ({ authSetting }) => {
@@ -23,16 +25,19 @@ function withPhotosAlbumAuth(callback) {
   })
 }
 
-function downloadFile(url) {
+function downloadFile(url, { onProgress } = {}) {
   return new Promise((resolve, reject) => {
-    wx.downloadFile({
-      url,
+    const task = wx.downloadFile({
+      url: resolveProxiedMediaUrl(url),
       success: (res) => {
         if (res.statusCode === 200) resolve(res.tempFilePath)
         else reject(new Error("download failed"))
       },
       fail: reject
     })
+    if (task && task.onProgressUpdate && onProgress) {
+      task.onProgressUpdate(({ progress = 0 }) => onProgress(Math.min(Math.round(progress), 99)))
+    }
   })
 }
 
@@ -57,27 +62,7 @@ function saveVideoFile(filePath) {
 }
 
 function saveVideoToAlbum(videoUrl, { onProgress } = {}) {
-  return new Promise((resolve, reject) => {
-    const task = wx.downloadFile({
-      url: videoUrl,
-      success: async (res) => {
-        if (res.statusCode !== 200) {
-          reject(new Error("download failed"))
-          return
-        }
-        try {
-          await saveVideoFile(res.tempFilePath)
-          resolve()
-        } catch (err) {
-          reject(err)
-        }
-      },
-      fail: reject
-    })
-    if (task && task.onProgressUpdate && onProgress) {
-      task.onProgressUpdate(({ progress = 0 }) => onProgress(Math.min(Math.round(progress), 99)))
-    }
-  })
+  return downloadFile(videoUrl, { onProgress }).then((tempFilePath) => saveVideoFile(tempFilePath))
 }
 
 function saveImagesToAlbum(images, { onProgress } = {}) {
@@ -87,36 +72,20 @@ function saveImagesToAlbum(images, { onProgress } = {}) {
   const run = (index) => {
     if (index >= total) return Promise.resolve()
     const imageUrl = images[index].url
-    return new Promise((resolve, reject) => {
-      const task = wx.downloadFile({
-        url: imageUrl,
-        success: async (res) => {
-          if (res.statusCode !== 200) {
-            reject(new Error(`download ${index + 1} failed`))
-            return
+    return downloadFile(imageUrl, {
+      onProgress: onProgress
+        ? (progress) => {
+            const overall = Math.min(Math.round(((index + progress / 100) / total) * 100), 99)
+            onProgress(overall)
           }
-          try {
-            await saveImageFile(res.tempFilePath)
-            completed += 1
-            if (onProgress) onProgress(Math.round((completed / total) * 100))
-            await run(index + 1)
-            resolve()
-          } catch (err) {
-            reject(err)
-          }
-        },
-        fail: reject
-      })
-      if (task && task.onProgressUpdate && onProgress) {
-        task.onProgressUpdate(({ progress = 0 }) => {
-          const overall = Math.min(
-            Math.round(((index + progress / 100) / total) * 100),
-            99
-          )
-          onProgress(overall)
-        })
-      }
+        : undefined
     })
+      .then(async (tempFilePath) => {
+        await saveImageFile(tempFilePath)
+        completed += 1
+        if (onProgress) onProgress(Math.round((completed / total) * 100))
+        await run(index + 1)
+      })
   }
 
   return run(0)

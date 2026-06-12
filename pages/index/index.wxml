@@ -75,7 +75,7 @@
             <video
               wx:if="{{parseResult.videoUrl}}"
               class="result-video"
-              src="{{parseResult.videoUrl}}"
+              src="{{parseResult.previewVideoUrl}}"
               controls
               show-center-play-btn
               object-fit="contain"
@@ -94,7 +94,7 @@
                 <swiper-item wx:for="{{images}}" wx:key="url">
                   <image
                     class="result-image"
-                    src="{{item.url}}"
+                    src="{{item.previewUrl}}"
                     mode="aspectFit"
                     bindtap="previewImages"
                   />

@@ -1,5 +1,6 @@
 const auth = require("./auth")
 const history = require("./history")
+const mediaProxy = require("./mediaProxy")
 
 const STORAGE_KEY = "mp_favorites"
 const MAX_FAVORITES = 200
@@ -148,7 +149,7 @@ async function getCount() {
 
 function getListForDisplay(list) {
   const source = list || getLocalList()
-  return source.map((it) => normalizeFavorite(it))
+  return source.map((it) => mediaProxy.withListItemPreviewUrls(normalizeFavorite(it)))
 }
 
 module.exports = {

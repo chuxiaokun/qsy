@@ -38,7 +38,7 @@
         bindtap="openDetail"
       >
         <view class="history-thumb-wrap">
-          <image wx:if="{{item.thumbUrl}}" class="history-thumb" src="{{item.thumbUrl}}" mode="aspectFill" />
+          <image wx:if="{{item.previewThumbUrl}}" class="history-thumb" src="{{item.previewThumbUrl}}" mode="aspectFill" />
           <view wx:else class="history-thumb history-thumb-video">
             <view class="icon icon-star icon-primary"></view>
           </view>

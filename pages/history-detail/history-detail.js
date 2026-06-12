@@ -1,5 +1,6 @@
 const historyStore = require("../../utils/history")
 const media = require("../../utils/media")
+const mediaProxy = require("../../utils/mediaProxy")
 const unlockGate = require("../../utils/unlock-gate")
 
 Page({
@@ -37,7 +38,7 @@ Page({
       .getById(id)
       .then((record) => {
         this.setData({
-          record,
+          record: record ? mediaProxy.withRecordPreviewUrls(record) : null,
           timeLabel: record ? historyStore.formatTimeLabel(record.createdAt) : "",
           hasLive: record ? historyStore.hasLivePhoto(record) : false,
           loading: false
@@ -63,7 +64,7 @@ Page({
   },
 
   previewImages() {
-    const urls = (this.data.record.images || []).map((item) => item.url).filter(Boolean)
+    const urls = (this.data.record.images || []).map((item) => item.previewUrl || item.url).filter(Boolean)
     if (!urls.length) return
     wx.previewImage({
       urls,

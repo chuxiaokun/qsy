@@ -24,7 +24,7 @@
 
     <view wx:else class="live-list">
       <view class="glass rounded-2xl shadow-soft card-block live-item" wx:for="{{items}}" wx:key="id">
-        <image class="live-thumb" src="{{item.url}}" mode="aspectFill" />
+        <image class="live-thumb" src="{{item.previewUrl}}" mode="aspectFill" />
         <view class="live-copy">
           <text class="live-title">{{item.title}}</text>
           <text class="live-time">{{item.timeLabel}}</text>

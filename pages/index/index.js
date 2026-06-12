@@ -2,6 +2,7 @@ const historyStore = require("../../utils/history")
 const media = require("../../utils/media")
 const auth = require("../../utils/auth")
 const parseApi = require("../../utils/parse")
+const mediaProxy = require("../../utils/mediaProxy")
 const entitlement = require("../../utils/entitlement")
 const unlockGate = require("../../utils/unlock-gate")
 const { getVersionLabel } = require("../../utils/version")
@@ -532,14 +533,18 @@ Page({
               icon: "success"
             })
             const images = (body.data.images || [])
-              .map((item) => ({
-                url: item.url || "",
-                livePhotoUrl: item.live_photo_url || ""
-              }))
+              .map((item) =>
+                mediaProxy.withImagePreviewUrls({
+                  url: item.url || "",
+                  livePhotoUrl: item.live_photo_url || ""
+                })
+              )
               .filter((item) => item.url)
 
+            const videoUrl = body.data.video_url || ""
             const parseResult = {
-              videoUrl: body.data.video_url || "",
+              videoUrl,
+              previewVideoUrl: mediaProxy.resolveProxiedMediaUrl(videoUrl),
               title: body.data.title || ""
             }
             const hasLivePhoto = images.some((item) => item.livePhotoUrl)
@@ -650,7 +655,7 @@ Page({
   },
 
   previewImages() {
-    const urls = (this.data.images || []).map((item) => item.url).filter(Boolean)
+    const urls = (this.data.images || []).map((item) => item.previewUrl || item.url).filter(Boolean)
     if (!urls.length) return
     wx.previewImage({
       urls,
