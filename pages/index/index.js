@@ -24,35 +24,36 @@ const platforms = [
 ]
 
 const products = [
-  {
-    id: "live-photo",
-    name: "Live Photo 保存",
-    description: "保存图集 Live 封面与动态视频",
-    iconClass: "icon-live",
-    colorClass: "product-pink",
-    bgClass: "product-bg-pink",
-    badge: "推荐",
-    badgeClass: "badge-hot",
-    page: "/pages/live-photo/live-photo"
-  },
-  {
-    id: "format-convert",
-    name: "格式转换",
-    description: "HEIC 转 JPG、视频转 GIF",
-    iconClass: "icon-convert",
-    colorClass: "product-sky",
-    bgClass: "product-bg-sky",
-    page: "/pages/format-convert/format-convert"
-  },
-  {
-    id: "image-compress",
-    name: "图片压缩",
-    description: "无损压缩图片，减少文件大小",
-    iconClass: "icon-image",
-    colorClass: "product-violet",
-    bgClass: "product-bg-violet",
-    page: "/pages/image-compress/image-compress"
-  }
+  // {
+  //   id: "live-photo",
+  //   name: "Live Photo 保存",
+  //   description: "保存图集 Live 封面与动态视频",
+  //   iconClass: "icon-live",
+  //   colorClass: "product-pink",
+  //   bgClass: "product-bg-pink",
+  //   badge: "推荐",
+  //   badgeClass: "badge-hot",
+  //   page: "/pages/live-photo/live-photo"
+  // },
+  // {
+  //   id: "format-convert",
+  //   name: "格式转换",
+  //   description: "HEIC 转 JPG、视频转 GIF",
+  //   iconClass: "icon-convert",
+  //   colorClass: "product-sky",
+  //   bgClass: "product-bg-sky",
+  //   page: "/pages/format-convert/format-convert"
+  // }
+  // },
+  // {
+  //   id: "image-compress",
+  //   name: "图片压缩",
+  //   description: "无损压缩图片，减少文件大小",
+  //   iconClass: "icon-image",
+  //   colorClass: "product-violet",
+  //   bgClass: "product-bg-violet",
+  //   page: "/pages/image-compress/image-compress"
+  // }
 ]
 
 const redPackets = [
