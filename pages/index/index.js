@@ -129,12 +129,18 @@ Page({
     appVersion: getVersionLabel(),
     noticeQueue: [],
     showNoticeModal: false,
-    currentNotice: null
+    currentNotice: null,
+    screenWidth: 375,
+    indicatorOffset: 0,
+    indicatorScale: 1,
+    tabIndex: 0,
+    isAnimating: false
   },
 
   onLoad() {
-    const { statusBarHeight = 0 } = wx.getWindowInfo()
-    this.setData({ statusBarHeight })
+    const info = wx.getWindowInfo()
+    const { statusBarHeight = 0, screenWidth = 375 } = info
+    this.setData({ statusBarHeight, screenWidth })
     this.initUser()
     this.loadAppVersion()
   },
@@ -267,8 +273,72 @@ Page({
 
   switchTab(event) {
     const tab = event.currentTarget.dataset.tab
-    this.setData({ activeTab: tab })
+    const indexMap = { remove: 0, products: 1, profile: 2 }
+    const index = indexMap[tab]
+    if (index === this.data.tabIndex) return
+
+    this.setData({ 
+      activeTab: tab,
+      tabIndex: index,
+      indicatorOffset: index * 100,
+      indicatorScale: 1,
+      isAnimating: true
+    })
     if (tab === "profile") this.refreshProfile()
+  },
+
+  onSwiperChange(e) {
+    const index = e.detail.current
+    const tabs = ["remove", "products", "profile"]
+    const tab = tabs[index]
+    const dataUpdate = { 
+      activeTab: tab,
+      tabIndex: index
+    }
+    
+    // 如果是触摸触发的，确保 isAnimating 为 false，以便 Transition 能正常执行
+    if (e.detail.source === 'touch') {
+      dataUpdate.isAnimating = false
+    }
+    
+    this.setData(dataUpdate)
+    if (tab === "profile") this.refreshProfile()
+  },
+
+  onSwiperTransition(e) {
+    if (this.data.isAnimating) return
+
+    const { dx } = e.detail
+    const { screenWidth, tabIndex } = this.data
+    
+    // dx 是相对于当前 tabIndex 所在页面的位移
+    // 如果 tabIndex 已经因为 switchTab 变为了目标页，dx 会从 -screenWidth 变到 0
+    let progress = dx / screenWidth
+    let offset = (tabIndex * 100) + progress * 100
+    
+    // 限制范围
+    if (offset < 0) offset = 0
+    if (offset > 200) offset = 200
+
+    // Liquid 拉伸：在中点 (progress=0.5) 附近拉伸最厉害
+    const absProgress = Math.abs(progress)
+    const stretch = (0.5 - Math.abs(absProgress - 0.5)) * 2
+    const indicatorScale = 1 + stretch * 0.35 // 最大拉伸 1.35 倍
+
+    this.setData({ 
+      indicatorOffset: offset,
+      indicatorScale: indicatorScale
+    })
+  },
+
+  onSwiperAnimationFinish(e) {
+    const index = e.detail.current
+    this.setData({
+      tabIndex: index,
+      indicatorOffset: index * 100,
+      indicatorScale: 1,
+      isAnimating: false
+    })
   },
 
   onProfileIdentityTap() {

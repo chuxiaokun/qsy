@@ -5,361 +5,399 @@
     <view class="decor decor-three"></view>
   </view>
 
-  <view class="main page-fade" style="padding-top: {{statusBarHeight}}px;">
-    <view wx:if="{{activeTab === 'remove'}}" class="section page-section">
-      <view class="brand-hero fade-down">
-        <view class="brand-hero-copy">
-          <text class="brand-kicker">KUN' TOOL</text>
-          <text class="title">去水印工具箱</text>
-          <text class="subtitle">粘贴链接，解析预览，一键保存高清内容</text>
-        </view>
-        <view class="brand-mark-wrap shadow-glow">
-          <view class="brand-tool-mark">
-            <image class="brand-logo-img" src="/pages/index/logo.png" mode="aspectFit" />
-          </view>
-        </view>
-      </view>
-
-      <view class="content-slide">
-        <view class="glass rounded-2xl input-card shadow-soft workbench-card">
-          <view wx:if="{{!showParseResult}}" class="input-col">
-            <view class="card-head">
-              <view>
-                <text class="card-title">开始解析</text>
-                <text class="card-desc">支持视频、图集与 Live Photo 链接</text>
-              </view>
-              <view class="status-pill">
-                <view class="status-dot"></view>
-                <text>在线</text>
-              </view>
+  <swiper 
+    class="main-swiper" 
+    current="{{tabIndex}}" 
+    bindchange="onSwiperChange" 
+    bindtransition="onSwiperTransition"
+    bindanimationfinish="onSwiperAnimationFinish"
+    cache-extent="1"
+  >
+    <!-- 去水印页 -->
+    <swiper-item>
+      <scroll-view scroll-y class="swiper-scroll-view" style="padding-top: {{statusBarHeight}}px;">
+        <view class="section page-section">
+          <view class="brand-hero fade-down">
+            <view class="brand-hero-copy">
+              <text class="brand-kicker">KUN' TOOL</text>
+              <text class="title">去水印工具箱</text>
+              <text class="subtitle">粘贴链接，解析预览，一键保存高清内容</text>
             </view>
-
-            <view class="input-wrap">
-              <input
-                class="link-input"
-                value="{{linkInput}}"
-                maxlength="-1"
-                bindinput="onLinkInput"
-                placeholder="粘贴视频或图片分享链接"
-                placeholder-class="placeholder"
-              />
-              <view wx:if="{{linkInput}}" class="clear-btn" bindtap="clearLink">
-                <view class="icon icon-x icon-muted icon-small"></view>
+            <view class="brand-mark-wrap shadow-glow">
+              <view class="brand-tool-mark">
+                <image class="brand-logo-img" src="/pages/index/logo.png" mode="aspectFit" />
               </view>
-            </view>
-
-            <view class="action-row">
-              <button class="paste-btn" bindtap="pasteFromClipboard">
-                <view class="icon icon-clipboard icon-primary icon-small"></view>
-                <text>粘贴</text>
-              </button>
-              <button class="submit-btn gradient-bg shadow-soft {{linkInput === '' || isProcessing ? 'is-disabled' : ''}}" bindtap="handleProcess">
-                <view wx:if="{{isProcessing}}" class="spinner"></view>
-                <text wx:else class="submit-text">解析并预览</text>
-              </button>
             </view>
           </view>
 
-          <view wx:else class="result-col content-slide">
-            <view class="result-head">
-              <view class="result-status">
-                <view class="result-status-dot"></view>
-                <text class="result-status-text">解析完成</text>
-              </view>
-              <view class="result-reset" bindtap="continueParse">
-                <view class="icon icon-link result-reset-icon"></view>
-                <text class="result-reset-text">解析其他链接</text>
-              </view>
-            </view>
+          <view class="content-slide">
+            <view class="glass rounded-2xl input-card shadow-soft workbench-card">
+              <view wx:if="{{!showParseResult}}" class="input-col">
+                <view class="card-head">
+                  <view>
+                    <text class="card-title">开始解析</text>
+                    <text class="card-desc">支持视频、图集与 Live Photo 链接</text>
+                  </view>
+                  <view class="status-pill">
+                    <view class="status-dot"></view>
+                    <text>在线</text>
+                  </view>
+                </view>
 
-            <video
-              wx:if="{{parseResult.videoUrl}}"
-              class="result-video"
-              src="{{parseResult.previewVideoUrl}}"
-              controls
-              show-center-play-btn
-              object-fit="contain"
-            />
-
-            <view wx:elif="{{images.length}}" class="result-gallery">
-              <swiper
-                class="result-swiper"
-                current="{{imageCurrent}}"
-                bindchange="onImageSwiperChange"
-                circular="{{images.length > 1}}"
-                indicator-dots="{{images.length > 1}}"
-                indicator-color="rgba(255,255,255,0.4)"
-                indicator-active-color="#38BDF8"
-              >
-                <swiper-item wx:for="{{images}}" wx:key="url">
-                  <image
-                    class="result-image"
-                    src="{{item.previewUrl}}"
-                    mode="aspectFit"
-                    bindtap="previewImages"
+                <view class="input-wrap">
+                  <input
+                    class="link-input"
+                    value="{{linkInput}}"
+                    maxlength="-1"
+                    bindinput="onLinkInput"
+                    placeholder="粘贴视频或图片分享链接"
+                    placeholder-class="placeholder"
                   />
-                </swiper-item>
-              </swiper>
-              <text wx:if="{{images.length > 1}}" class="result-gallery-count">{{imageCurrent + 1}} / {{images.length}}</text>
-            </view>
+                  <view wx:if="{{linkInput}}" class="clear-btn" bindtap="clearLink">
+                    <view class="icon icon-x icon-muted icon-small"></view>
+                  </view>
+                </view>
 
-            <view class="result-meta">
-              <text class="result-meta-label">{{parseResult.videoUrl ? '视频标题' : '作品标题'}}</text>
-              <text class="result-title">{{parseResult.title}}</text>
-            </view>
-
-            <view class="result-actions">
-              <button class="result-btn gradient-bg shadow-soft {{isSavingVideo ? 'is-disabled' : ''}}" bindtap="saveVideo" disabled="{{isSavingVideo}}">
-                {{isSavingVideo ? '保存中...' : '保存到相册'}}
-              </button>
-              <button class="result-btn result-btn-outline" bindtap="toggleFavorite">
-                {{isFavorited ? '已收藏' : '收藏'}}
-              </button>
-              <button wx:if="{{hasLivePhoto}}" class="result-btn result-btn-outline {{isSavingLive ? 'is-disabled' : ''}}" bindtap="saveLivePhotos" disabled="{{isSavingLive}}">
-                {{isSavingLive ? '保存中...' : '保存 Live Photo'}}
-              </button>
-              <button class="result-btn result-btn-outline" bindtap="copyTitle">复制标题</button>
-            </view>
-
-            <view wx:if="{{showDownloadProgress}}" class="download-progress">
-              <view class="download-progress-head">
-                <text class="download-progress-label">{{downloadPhase === 'saving' ? '正在写入相册' : (parseResult.videoUrl ? '正在下载视频' : '正在下载图片')}}</text>
-                <text class="download-progress-value">{{downloadProgress}}%</text>
+                <view class="action-row">
+                  <button class="paste-btn" bindtap="pasteFromClipboard">
+                    <view class="icon icon-clipboard icon-primary icon-small"></view>
+                    <text>粘贴</text>
+                  </button>
+                  <button class="submit-btn gradient-bg shadow-soft {{linkInput === '' || isProcessing ? 'is-disabled' : ''}}" bindtap="handleProcess">
+                    <view wx:if="{{isProcessing}}" class="spinner"></view>
+                    <text wx:else class="submit-text">解析并预览</text>
+                  </button>
+                </view>
               </view>
-              <view class="download-progress-track">
-                <view class="download-progress-bar" style="width: {{downloadProgress}}%;"></view>
+
+              <view wx:else class="result-col content-slide">
+                <view class="result-head">
+                  <view class="result-status">
+                    <view class="result-status-dot"></view>
+                    <text class="result-status-text">解析完成</text>
+                  </view>
+                  <view class="result-reset" bindtap="continueParse">
+                    <view class="icon icon-link result-reset-icon"></view>
+                    <text class="result-reset-text">解析其他链接</text>
+                  </view>
+                </view>
+
+                <video
+                  wx:if="{{parseResult.videoUrl}}"
+                  class="result-video"
+                  src="{{parseResult.previewVideoUrl}}"
+                  controls
+                  show-center-play-btn
+                  object-fit="contain"
+                />
+
+                <view wx:elif="{{images.length}}" class="result-gallery">
+                  <swiper
+                    class="result-swiper"
+                    current="{{imageCurrent}}"
+                    bindchange="onImageSwiperChange"
+                    circular="{{images.length > 1}}"
+                    indicator-dots="{{images.length > 1}}"
+                    indicator-color="rgba(255,255,255,0.4)"
+                    indicator-active-color="#38BDF8"
+                  >
+                    <swiper-item wx:for="{{images}}" wx:key="url">
+                      <image
+                        class="result-image"
+                        src="{{item.previewUrl}}"
+                        mode="aspectFit"
+                        bindtap="previewImages"
+                      />
+                    </swiper-item>
+                  </swiper>
+                  <text wx:if="{{images.length > 1}}" class="result-gallery-count">{{imageCurrent + 1}} / {{images.length}}</text>
+                </view>
+
+                <view class="result-meta">
+                  <text class="result-meta-label">{{parseResult.videoUrl ? '视频标题' : '作品标题'}}</text>
+                  <text class="result-title">{{parseResult.title}}</text>
+                </view>
+
+                <view class="result-actions">
+                  <button class="result-btn gradient-bg shadow-soft {{isSavingVideo ? 'is-disabled' : ''}}" bindtap="saveVideo" disabled="{{isSavingVideo}}">
+                    {{isSavingVideo ? '保存中...' : '保存到相册'}}
+                  </button>
+                  <button class="result-btn result-btn-outline" bindtap="toggleFavorite">
+                    {{isFavorited ? '已收藏' : '收藏'}}
+                  </button>
+                  <button wx:if="{{hasLivePhoto}}" class="result-btn result-btn-outline {{isSavingLive ? 'is-disabled' : ''}}" bindtap="saveLivePhotos" disabled="{{isSavingLive}}">
+                    {{isSavingLive ? '保存中...' : '保存 Live Photo'}}
+                  </button>
+                  <button class="result-btn result-btn-outline" bindtap="copyTitle">复制标题</button>
+                </view>
+
+                <view wx:if="{{showDownloadProgress}}" class="download-progress">
+                  <view class="download-progress-head">
+                    <text class="download-progress-label">{{downloadPhase === 'saving' ? '正在写入相册' : (parseResult.videoUrl ? '正在下载视频' : '正在下载图片')}}</text>
+                    <text class="download-progress-value">{{downloadProgress}}%</text>
+                  </view>
+                  <view class="download-progress-track">
+                    <view class="download-progress-bar" style="width: {{downloadProgress}}%;"></view>
+                  </view>
+                </view>
+              </view>
+            </view>
+
+            <view wx:if="{{!showParseResult}}" class="glass rounded-2xl platform-card shadow-soft">
+              <view class="card-head compact-head">
+                <view>
+                  <text class="card-title">常用平台</text>
+                  <text class="card-desc">覆盖主流短视频与图文平台</text>
+                </view>
+              </view>
+              <view class="platform-grid">
+                <view class="platform-item" wx:for="{{platforms}}" wx:key="id">
+                  <view class="platform-dot {{item.dotClass}}"></view>
+                  <text class="platform-name">{{item.name}}</text>
+                </view>
               </view>
             </view>
           </view>
-        </view>
 
-        <view wx:if="{{!showParseResult}}" class="glass rounded-2xl platform-card shadow-soft">
-          <view class="card-head compact-head">
-            <view>
-              <text class="card-title">常用平台</text>
-              <text class="card-desc">覆盖主流短视频与图文平台</text>
+          <view class="tool-strip">
+            <view class="tool-strip-item">
+              <view class="icon icon-history icon-primary icon-small"></view>
+              <text>自动记录</text>
+            </view>
+            <view class="tool-strip-item">
+              <view class="icon icon-image icon-primary icon-small"></view>
+              <text>图集预览</text>
+            </view>
+            <view class="tool-strip-item">
+              <view class="icon icon-live icon-primary icon-small"></view>
+              <text>Live 保存</text>
             </view>
           </view>
-          <view class="platform-grid">
-            <view class="platform-item" wx:for="{{platforms}}" wx:key="id">
-              <view class="platform-dot {{item.dotClass}}"></view>
-              <text class="platform-name">{{item.name}}</text>
-            </view>
-          </view>
         </view>
-      </view>
+      </scroll-view>
+    </swiper-item>
 
-      <view class="tool-strip">
-        <view class="tool-strip-item">
-          <view class="icon icon-history icon-primary icon-small"></view>
-          <text>自动记录</text>
-        </view>
-        <view class="tool-strip-item">
-          <view class="icon icon-image icon-primary icon-small"></view>
-          <text>图集预览</text>
-        </view>
-        <view class="tool-strip-item">
-          <view class="icon icon-live icon-primary icon-small"></view>
-          <text>Live 保存</text>
-        </view>
-      </view>
-    </view>
+    <!-- 更多产品页 -->
+    <swiper-item>
+      <scroll-view scroll-y class="swiper-scroll-view" style="padding-top: {{statusBarHeight}}px;">
+        <view class="section page-section">
+          <view class="page-head fade-down">
+            <text class="page-title">更多产品</text>
+            <text class="page-desc">发现更多实用工具</text>
+          </view>
 
-    <view wx:elif="{{activeTab === 'products'}}" class="section page-section">
-      <view class="page-head fade-down">
-        <text class="page-title">更多产品</text>
-        <text class="page-desc">发现更多实用工具</text>
-      </view>
-
-      <view class="promo promo-soon gradient-bg shadow-glow" bindtap="onComingSoon">
-        <view class="promo-orb"></view>
-        <view class="promo-content">
-          <view class="promo-kicker">
-            <view class="icon icon-zap icon-yellow icon-small"></view>
-            <text>即将上线</text>
-          </view>
-          <text class="promo-title">会员尊享全部功能</text>
-      
-          <view class="promo-btn promo-btn-disabled">
-            <text>敬请期待</text>
-          </view>
-        </view>
-        <!-- <view class="icon icon-star promo-star"></view> -->
-      </view>
-
-      <view class="product-list">
-        <view class="glass rounded-2xl product-card shadow-soft" wx:for="{{products}}" wx:key="id" data-page="{{item.page}}" bindtap="onProductTap">
-          <view class="product-icon-wrap {{item.bgClass}}">
-            <view class="product-icon-core {{item.colorClass}}">
-              <view class="icon {{item.iconClass}} icon-white icon-product"></view>
-            </view>
-          </view>
-          <view class="product-copy">
-            <view class="product-title-row">
-              <text class="product-title">{{item.name}}</text>
-              <text wx:if="{{item.badge}}" class="badge {{item.badgeClass}}">{{item.badge}}</text>
-            </view>
-            <text class="product-desc">{{item.description}}</text>
-          </view>
-          <view class="icon icon-arrow-right icon-muted product-arrow"></view>
-        </view>
-      </view>
-
-      <text class="bottom-note">更多工具持续上线中...</text>
-      <ad-custom unit-id="adunit-80bfa2206fc320fc" bindload="adLoad" binderror="adError" bindclose="adClose"></ad-custom>
-      <view class="redpacket-section fade-up">
-        <view class="redpacket-head">
-          <view>
-            <text class="redpacket-eyebrow">红包福利</text>
-            <text class="redpacket-headline">先领红包再下单</text>
-          </view>
-        </view>
-        <view class="redpacket-grid">
-          <button
-            class="redpacket-card {{item.themeClass}}"
-            hover-class="redpacket-card-hover"
-            hover-stay-time="80"
-            wx:for="{{redPackets}}"
-            wx:key="id"
-            data-id="{{item.id}}"
-            bindtap="onRedPacketTap"
-          >
-            <view class="redpacket-card-head">
-              <view class="redpacket-logo-wrap">
-                <image class="redpacket-logo {{item.logoClass}}" src="{{item.iconSrc}}" mode="aspectFit" />
+          <view class="promo promo-soon gradient-bg shadow-glow" bindtap="onComingSoon">
+            <view class="promo-orb"></view>
+            <view class="promo-content">
+              <view class="promo-kicker">
+                <view class="icon icon-zap icon-yellow icon-small"></view>
+                <text>即将上线</text>
               </view>
-              <text class="redpacket-tag">{{item.tag}}</text>
-            </view>
-            <view class="redpacket-copy">
-              <text class="redpacket-title">{{item.name}}</text>
-              <text class="redpacket-desc">{{item.description}}</text>
-            </view>
-            <view class="redpacket-action">
-              <text>去领取</text>
-              <view class="icon icon-arrow-right redpacket-arrow"></view>
-            </view>
-          </button>
-        </view>
-      </view>
-      <br/>
-      <br/>
-    </view>
-
-    <view wx:else class="section page-section profile-section">
-      <view class="glass rounded-3xl user-card shadow-soft fade-down">
-        <view class="user-row" bindtap="onProfileIdentityTap">
-          <view class="avatar-wrap">
-            <image wx:if="{{user.avatarUrl}}" class="avatar avatar-img shadow-glow" src="{{user.avatarUrl}}" mode="aspectFill" />
-            <view wx:else class="avatar gradient-bg shadow-glow">
-              <text class="avatar-text">{{userInitial}}</text>
-            </view>
-            <view wx:if="{{isVip}}" class="vip-crown-badge">
-              <image class="profile-vip-crown-img" src="/assets/icons/lucide/crown-amber.png" mode="aspectFit" />
+              <text class="promo-title">会员尊享全部功能</text>
+          
+              <view class="promo-btn promo-btn-disabled">
+                <text>敬请期待</text>
+              </view>
             </view>
           </view>
-          <view class="user-info">
-            <view class="name-row">
-              <text class="user-name">{{user.nickname || '游客'}}</text>
-              <text wx:if="{{user.isGuest}}" class="guest-badge">游客</text>
+
+          <view class="product-list">
+            <view class="glass rounded-2xl product-card shadow-soft" wx:for="{{products}}" wx:key="id" data-page="{{item.page}}" bindtap="onProductTap">
+              <view class="product-icon-wrap {{item.bgClass}}">
+                <view class="product-icon-core {{item.colorClass}}">
+                  <view class="icon {{item.iconClass}} icon-white icon-product"></view>
+                </view>
+              </view>
+              <view class="product-copy">
+                <view class="product-title-row">
+                  <text class="product-title">{{item.name}}</text>
+                  <text wx:if="{{item.badge}}" class="badge {{item.badgeClass}}">{{item.badge}}</text>
+                </view>
+                <text class="product-desc">{{item.description}}</text>
+              </view>
+              <view class="icon icon-arrow-right icon-muted product-arrow"></view>
             </view>
-            <text class="user-id">ID: {{userDisplayId}}</text>
-            <text wx:if="{{emailBound}}" class="user-email">{{user.email}}</text>
+          </view>
+
+          <text class="bottom-note">更多工具持续上线中...</text>
+          <ad-custom unit-id="adunit-80bfa2206fc320fc" bindload="adLoad" binderror="adError" bindclose="adClose"></ad-custom>
+          <view class="redpacket-section fade-up">
+            <view class="redpacket-head">
+              <view>
+                <text class="redpacket-eyebrow">红包福利</text>
+                <text class="redpacket-headline">先领红包再下单</text>
+              </view>
+            </view>
+            <view class="redpacket-grid">
+              <button
+                class="redpacket-card {{item.themeClass}}"
+                hover-class="redpacket-card-hover"
+                hover-stay-time="80"
+                wx:for="{{redPackets}}"
+                wx:key="id"
+                data-id="{{item.id}}"
+                bindtap="onRedPacketTap"
+              >
+                <view class="redpacket-card-head">
+                  <view class="redpacket-logo-wrap">
+                    <image class="redpacket-logo {{item.logoClass}}" src="{{item.iconSrc}}" mode="aspectFit" />
+                  </view>
+                  <text class="redpacket-tag">{{item.tag}}</text>
+                </view>
+                <view class="redpacket-copy">
+                  <text class="redpacket-title">{{item.name}}</text>
+                  <text class="redpacket-desc">{{item.description}}</text>
+                </view>
+                <view class="redpacket-action">
+                  <text>去领取</text>
+                  <view class="icon icon-arrow-right redpacket-arrow"></view>
+                </view>
+              </button>
+            </view>
           </view>
         </view>
-      </view>
+      </scroll-view>
+    </swiper-item>
 
-      <view class="glass rounded-2xl menu-card shadow-soft profile-action-card">
-        <view class="menu-item" bindtap="goBindEmail">
-          <view class="menu-icon-box">
-            <image class="profile-icon-img" src="/assets/icons/lucide/mail.png" mode="aspectFit" />
-          </view>
-          <view class="menu-copy">
-            <text class="menu-title">绑定邮箱</text>
-            <text class="menu-desc">{{emailBound ? '已绑定，点击查看' : '绑定后可接收通知与找回账号'}}</text>
-          </view>
-          <image class="menu-chevron" src="/assets/icons/lucide/chevron-right-muted.png" mode="aspectFit" />
-        </view>
-      </view>
-
-      <view class="glass rounded-2xl member-soon-card shadow-soft" bindtap="onComingSoon">
-        <view class="member-soon-head">
-          <image class="member-crown-img" src="/assets/icons/lucide/crown-amber.png" mode="aspectFit" />
-          <text class="member-soon-title">{{isVip ? 'VIP 会员' : '开通 VIP'}}</text>
-          <text class="member-soon-tag">{{isVip ? '已开通' : '联系客服'}}</text>
-        </view>
-        <text class="member-soon-desc">{{isVip ? '尊享永久免广告与全部功能' : '请联系客服开通会员'}}</text>
-      </view>
-
-      <view class="glass rounded-2xl usage-card shadow-soft">
-        <view class="usage-item">
-          <text class="usage-value">{{usageCount}}</text>
-          <text class="usage-label">处理次数</text>
-        </view>
-        <view class="usage-item">
-          <text class="usage-value">—</text>
-          <text class="usage-label">节省时间</text>
-        </view>
-        <view class="usage-item">
-          <text class="usage-value">—</text>
-          <text class="usage-label">连续使用</text>
-        </view>
-      </view>
-
-      <view class="glass rounded-2xl menu-card shadow-soft">
-        <block wx:for="{{menuItems}}" wx:key="id">
-          <button
-            wx:if="{{item.id === 'invite'}}"
-            class="menu-item menu-item-btn {{index < menuItems.length - 1 ? 'has-border' : ''}}"
-            open-type="share"
-          >
-            <view class="menu-icon-box">
-              <image class="profile-icon-img" src="{{item.iconSrc}}" mode="aspectFit" />
+    <!-- 个人中心页 -->
+    <swiper-item>
+      <scroll-view scroll-y class="swiper-scroll-view" style="padding-top: {{statusBarHeight}}px;">
+        <view class="section page-section profile-section">
+          <view class="glass rounded-3xl user-card shadow-soft fade-down">
+            <view class="user-row" bindtap="onProfileIdentityTap">
+              <view class="avatar-wrap">
+                <image wx:if="{{user.avatarUrl}}" class="avatar avatar-img shadow-glow" src="{{user.avatarUrl}}" mode="aspectFill" />
+                <view wx:else class="avatar gradient-bg shadow-glow">
+                  <text class="avatar-text">{{userInitial}}</text>
+                </view>
+                <view wx:if="{{isVip}}" class="vip-crown-badge">
+                  <image class="profile-vip-crown-img" src="/assets/icons/lucide/crown-amber.png" mode="aspectFit" />
+                </view>
+              </view>
+              <view class="user-info">
+                <view class="name-row">
+                  <text class="user-name">{{user.nickname || '游客'}}</text>
+                  <text wx:if="{{user.isGuest}}" class="guest-badge">游客</text>
+                </view>
+                <text class="user-id">ID: {{userDisplayId}}</text>
+                <text wx:if="{{emailBound}}" class="user-email">{{user.email}}</text>
+              </view>
             </view>
-            <view class="menu-copy">
-              <text class="menu-title">{{item.name}}</text>
-              <text class="menu-desc">{{item.description}}</text>
-            </view>
-            <view class="menu-right">
-              <text wx:if="{{item.badge}}" class="badge {{item.badgeClass}}">{{item.badge}}</text>
+          </view>
+
+          <view class="glass rounded-2xl menu-card shadow-soft profile-action-card">
+            <view class="menu-item" bindtap="goBindEmail">
+              <view class="menu-icon-box">
+                <image class="profile-icon-img" src="/assets/icons/lucide/mail.png" mode="aspectFit" />
+              </view>
+              <view class="menu-copy">
+                <text class="menu-title">绑定邮箱</text>
+                <text class="menu-desc">{{emailBound ? '已绑定，点击查看' : '绑定后可接收通知与找回账号'}}</text>
+              </view>
               <image class="menu-chevron" src="/assets/icons/lucide/chevron-right-muted.png" mode="aspectFit" />
             </view>
-          </button>
-          <view
-            wx:else
-            class="menu-item {{index < menuItems.length - 1 ? 'has-border' : ''}}"
-            data-id="{{item.id}}"
-            bindtap="onMenuTap"
-          >
-            <view class="menu-icon-box">
-              <image class="profile-icon-img" src="{{item.iconSrc}}" mode="aspectFit" />
+          </view>
+
+          <view class="glass rounded-2xl member-soon-card shadow-soft" bindtap="onComingSoon">
+            <view class="member-soon-head">
+              <image class="member-crown-img" src="/assets/icons/lucide/crown-amber.png" mode="aspectFit" />
+              <text class="member-soon-title">{{isVip ? 'VIP 会员' : '开通 VIP'}}</text>
+              <text class="member-soon-tag">{{isVip ? '已开通' : '联系客服'}}</text>
             </view>
-            <view class="menu-copy">
-              <text class="menu-title">{{item.name}}</text>
-              <text class="menu-desc">{{item.description}}</text>
+            <text class="member-soon-desc">{{isVip ? '尊享永久免广告与全部功能' : '请联系客服开通会员'}}</text>
+          </view>
+
+          <view class="glass rounded-2xl usage-card shadow-soft">
+            <view class="usage-item">
+              <text class="usage-value">{{usageCount}}</text>
+              <text class="usage-label">处理次数</text>
             </view>
-            <view class="menu-right">
-              <text wx:if="{{item.badge}}" class="badge {{item.badgeClass}}">{{item.badge}}</text>
+            <view class="usage-item">
+              <text class="usage-value">—</text>
+              <text class="usage-label">节省时间</text>
+            </view>
+            <view class="usage-item">
+              <text class="usage-value">—</text>
+              <text class="usage-label">连续使用</text>
+            </view>
+          </view>
+
+          <view class="glass rounded-2xl menu-card shadow-soft">
+            <block wx:for="{{menuItems}}" wx:key="id">
+              <button
+                wx:if="{{item.id === 'invite'}}"
+                class="menu-item menu-item-btn {{index < menuItems.length - 1 ? 'has-border' : ''}}"
+                open-type="share"
+              >
+                <view class="menu-icon-box">
+                  <image class="profile-icon-img" src="{{item.iconSrc}}" mode="aspectFit" />
+                </view>
+                <view class="menu-copy">
+                  <text class="menu-title">{{item.name}}</text>
+                  <text class="menu-desc">{{item.description}}</text>
+                </view>
+                <view class="menu-right">
+                  <text wx:if="{{item.badge}}" class="badge {{item.badgeClass}}">{{item.badge}}</text>
+                  <image class="menu-chevron" src="/assets/icons/lucide/chevron-right-muted.png" mode="aspectFit" />
+                </view>
+              </button>
+              <view
+                wx:else
+                class="menu-item {{index < menuItems.length - 1 ? 'has-border' : ''}}"
+                data-id="{{item.id}}"
+                bindtap="onMenuTap"
+              >
+                <view class="menu-icon-box">
+                  <image class="profile-icon-img" src="{{item.iconSrc}}" mode="aspectFit" />
+                </view>
+                <view class="menu-copy">
+                  <text class="menu-title">{{item.name}}</text>
+                  <text class="menu-desc">{{item.description}}</text>
+                </view>
+                <view class="menu-right">
+                  <text wx:if="{{item.badge}}" class="badge {{item.badgeClass}}">{{item.badge}}</text>
+                  <image class="menu-chevron" src="/assets/icons/lucide/chevron-right-muted.png" mode="aspectFit" />
+                </view>
+              </view>
+            </block>
+          </view>
+
+          <view class="glass rounded-2xl menu-card shadow-soft settings-card">
+            <view class="setting-item {{index < settingsItems.length - 1 ? 'has-border' : ''}}" wx:for="{{settingsItems}}" wx:key="id" data-id="{{item.id}}" bindtap="onSettingTap">
+              <image class="setting-icon-img" src="{{item.iconSrc}}" mode="aspectFit" />
+              <text class="setting-title">{{item.name}}</text>
               <image class="menu-chevron" src="/assets/icons/lucide/chevron-right-muted.png" mode="aspectFit" />
             </view>
           </view>
-        </block>
-      </view>
 
-      <view class="glass rounded-2xl menu-card shadow-soft settings-card">
-        <view class="setting-item {{index < settingsItems.length - 1 ? 'has-border' : ''}}" wx:for="{{settingsItems}}" wx:key="id" data-id="{{item.id}}" bindtap="onSettingTap">
-          <image class="setting-icon-img" src="{{item.iconSrc}}" mode="aspectFit" />
-          <text class="setting-title">{{item.name}}</text>
-          <image class="menu-chevron" src="/assets/icons/lucide/chevron-right-muted.png" mode="aspectFit" />
+          <text class="version">{{appVersion}}</text>
+          <view class="profile-ad-wrap">
+            <ad-custom unit-id="adunit-dcee7d81b59808ef" bindload="adLoad" binderror="adError" bindclose="adClose"></ad-custom>
+          </view>
         </view>
-      </view>
+      </scroll-view>
+    </swiper-item>
+  </swiper>
 
-      <text class="version">{{appVersion}}</text>
-      <view class="profile-ad-wrap">
-        <ad-custom unit-id="adunit-dcee7d81b59808ef" bindload="adLoad" binderror="adError" bindclose="adClose"></ad-custom>
-      </view>
+  <view class="tabbar">
+    <view class="tabbar-inner">
+      <view class="tab-indicator {{isAnimating ? 'is-animating' : ''}}" style="transform: translateX({{indicatorOffset}}%) scaleX({{indicatorScale}})"></view>
+      <button class="tab-item {{activeTab === 'remove' ? 'tab-active' : ''}}" data-tab="remove" bindtap="switchTab">
+        <view class="icon icon-droplets tab-icon"></view>
+        <text class="tab-text">去水印</text>
+      </button>
+      <button class="tab-item {{activeTab === 'products' ? 'tab-active' : ''}}" data-tab="products" bindtap="switchTab">
+        <view class="icon icon-grid tab-icon"></view>
+        <text class="tab-text">更多产品</text>
+      </button>
+      <button class="tab-item {{activeTab === 'profile' ? 'tab-active' : ''}}" data-tab="profile" bindtap="switchTab">
+        <view class="icon icon-user tab-icon"></view>
+        <text class="tab-text">个人中心</text>
+      </button>
     </view>
   </view>
 
+  <!-- 弹窗部分保持不变 -->
   <view wx:if="{{showNoticeModal && currentNotice}}" class="profile-modal-mask" catchtouchmove="preventNoticeModalMove">
     <view class="notice-modal glass rounded-2xl shadow-soft">
       <view class="notice-modal-header">
@@ -415,26 +453,6 @@
         保存
       </button>
       <button class="profile-modal-skip" bindtap="onDismissProfileModal">稍后再说</button>
-    </view>
-  </view>
-
-  <view class="tabbar">
-    <view class="glass-strong rounded-2xl tabbar-inner shadow-soft">
-      <button class="tab-item {{activeTab === 'remove' ? 'tab-active' : ''}}" data-tab="remove" bindtap="switchTab">
-        <view wx:if="{{activeTab === 'remove'}}" class="tab-active-bg"></view>
-        <view class="icon icon-droplets tab-icon"></view>
-        <text class="tab-text">去水印</text>
-      </button>
-      <button class="tab-item {{activeTab === 'products' ? 'tab-active' : ''}}" data-tab="products" bindtap="switchTab">
-        <view wx:if="{{activeTab === 'products'}}" class="tab-active-bg"></view>
-        <view class="icon icon-grid tab-icon"></view>
-        <text class="tab-text">更多产品</text>
-      </button>
-      <button class="tab-item {{activeTab === 'profile' ? 'tab-active' : ''}}" data-tab="profile" bindtap="switchTab">
-        <view wx:if="{{activeTab === 'profile'}}" class="tab-active-bg"></view>
-        <view class="icon icon-user tab-icon"></view>
-        <text class="tab-text">个人中心</text>
-      </button>
     </view>
   </view>
 </view>
