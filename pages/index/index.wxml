@@ -5,16 +5,9 @@
     <view class="decor decor-three"></view>
   </view>
 
-  <swiper 
-    class="main-swiper" 
-    current="{{tabIndex}}" 
-    bindchange="onSwiperChange" 
-    bindtransition="onSwiperTransition"
-    bindanimationfinish="onSwiperAnimationFinish"
-    cache-extent="1"
-  >
+  <view class="main-tab-pages" style="transform: translateX({{pageTrackOffset}}%);">
     <!-- 去水印页 -->
-    <swiper-item>
+    <view class="main-tab-page">
       <scroll-view scroll-y class="swiper-scroll-view" style="padding-top: {{statusBarHeight}}px;">
         <view class="section page-section">
           <view class="brand-hero fade-down">
@@ -159,7 +152,7 @@
             </view>
           </view>
 
-          <view class="tool-strip">
+          <!-- <view class="tool-strip">
             <view class="tool-strip-item">
               <view class="icon icon-history icon-primary icon-small"></view>
               <text>自动记录</text>
@@ -172,13 +165,13 @@
               <view class="icon icon-live icon-primary icon-small"></view>
               <text>Live 保存</text>
             </view>
-          </view>
+          </view> -->
         </view>
       </scroll-view>
-    </swiper-item>
+    </view>
 
     <!-- 更多产品页 -->
-    <swiper-item>
+    <view class="main-tab-page">
       <scroll-view scroll-y class="swiper-scroll-view" style="padding-top: {{statusBarHeight}}px;">
         <view class="section page-section">
           <view class="page-head fade-down">
@@ -221,7 +214,7 @@
 
           <text class="bottom-note">更多工具持续上线中...</text>
           <ad-custom unit-id="adunit-80bfa2206fc320fc" bindload="adLoad" binderror="adError" bindclose="adClose"></ad-custom>
-          <view class="redpacket-section fade-up">
+          <!-- <view class="redpacket-section fade-up">
             <view class="redpacket-head">
               <view>
                 <text class="redpacket-eyebrow">红包福利</text>
@@ -254,13 +247,13 @@
                 </view>
               </button>
             </view>
-          </view>
+          </view> -->
         </view>
       </scroll-view>
-    </swiper-item>
+    </view>
 
     <!-- 个人中心页 -->
-    <swiper-item>
+    <view class="main-tab-page">
       <scroll-view scroll-y class="swiper-scroll-view" style="padding-top: {{statusBarHeight}}px;">
         <view class="section page-section profile-section">
           <view class="glass rounded-3xl user-card shadow-soft fade-down">
@@ -376,8 +369,8 @@
           </view>
         </view>
       </scroll-view>
-    </swiper-item>
-  </swiper>
+    </view>
+  </view>
 
   <view class="tabbar">
     <view class="tabbar-inner">
